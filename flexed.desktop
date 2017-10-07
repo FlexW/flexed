@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=flexed
+Comment=Text Editor
+Exec=application
+Icon=flexed_icon.png
+Terminal=false

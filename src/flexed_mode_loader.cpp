@@ -16,37 +16,71 @@ mode_loader::mode_loader() {
 mode_loader::~mode_loader() {
 }
 
-void mode_loader::load_mode(std::string& name) {
-  if (mode_map.find(name) != mode_map.end()) {
+bool mode_loader::load_mode(std::string& buffer_name, std::string& mode_name) {
+  void* mode_handle = nullptr;
+  if (is_mode_in_buffer_open(mode_name, buffer_name)) {
+      g_print("mode in buffer already open\n");
+      return false;
+  }
+  auto iter_mode_handle = mode_handle_map.find(mode_name);
+  if (iter_mode_handle != mode_handle_map.end()) {
       g_print("mode already loaded\n");
-      return;
+      mode_handle = iter_mode_handle->second;
+      mode_handle_map.insert(
+          std::pair<std::string, void*>(mode_name, mode_handle));
+      mode_buffer_map.insert(
+          std::pair<std::string, std::string>(mode_name, buffer_name));
   }
-  std::string real_name = name;
-  std::string fpath = FLEXED_MODE_PATH;
-  real_name = replace_minus_with_underscore(real_name);
-  fpath += mode_name_to_lib_name(real_name);
-  g_print("try to load: %s\n", fpath.c_str());
-
-  void* mode_handle = dlopen(fpath.c_str(), RTLD_NOW);
-  mode_map[name] = mode_handle;
-  g_print("mode handle: %p\n", mode_handle);
-  g_print("saved mode as: %s\n", name.c_str());
-
-  if (mode_map[name] != nullptr) {
-    g_print("mode loaded\n");
-    call_mode_start_function(name);
-    return;
+  else {
+      std::string real_name = mode_name;
+      std::string fpath = FLEXED_MODE_PATH;
+      real_name = replace_minus_with_underscore(real_name);
+      fpath += mode_name_to_lib_name(real_name);
+      g_print("try to load: %s\n", fpath.c_str());
+      mode_handle = dlopen(fpath.c_str(), RTLD_NOW);
+      if (mode_handle == nullptr) {
+          g_print("mode not loaded\n");
+          return false;
+      }
+      mode_handle_map.insert(
+          std::pair<std::string, void*>(mode_name, mode_handle));
+      mode_buffer_map.insert(
+          std::pair<std::string, std::string>(mode_name, buffer_name));
+      g_print("mode handle: %p\n", mode_handle);
+      g_print("saved mode as: %s\n", mode_name.c_str());
+      g_print("mode loaded\n");
+      call_mode_start_function(mode_name);
   }
-  mode_map.erase(name);
-  g_print("mode not loaded\n");
+  call_mode_buffer_start_function(mode_name);
+  return true;
 }
 
-void mode_loader::call_function(std::list<std::string>& mode_list, std::string& name) {
+void mode_loader::unload_mode(std::string& buffer_name,
+                              std::string& mode_name) {
+    if (!is_mode_in_buffer_open(mode_name, buffer_name)) {
+        g_print("mode in buffer not open\n");
+        return;
+    }
+    call_mode_buffer_end_function(mode_name);
+    if (mode_handle_map.count(mode_name) == 1) {
+        g_print("unload shared lib\n");
+        call_mode_end_function(mode_name);
+        dlclose(mode_handle_map.find(mode_name)->second);
+    }
+    g_print("call buffer end func\n");
+    auto iter_mode_handle = mode_handle_map.find(mode_name);
+    auto iter_mode_buffer = mode_buffer_map.find(mode_name);
+    erase_mode_buffer_map(buffer_name, mode_name);
+    mode_handle_map.erase(iter_mode_handle);
+}
+
+void mode_loader::call_function(std::list<std::string>& mode_list,
+                                std::string& name) {
     g_print("mode_loader::call_function\n");
     for (auto mode : mode_list) {
         g_print("try to find function %s in mode: %s\n", name.c_str(), mode.c_str());
-        auto iter = mode_map.find(mode);
-        if (iter != mode_map.end()) {
+        auto iter = mode_handle_map.find(mode);
+        if (iter != mode_handle_map.end()) {
             g_print("mode handle: %p\n", iter->second);
             func_type* ffunction = (func_type*)dlsym(iter->second, name.c_str());
             if (!ffunction) {
@@ -69,6 +103,30 @@ void mode_loader::call_mode_start_function(std::string& mode_name) {
 
     std::list<std::string> l = {mode_name};
     g_print("call start func: %s in mode: %s\n", fname.c_str(), mode_name.c_str());
+    call_function(l, fname);
+}
+
+bool mode_loader::call_mode_buffer_start_function(std::string& mode_name) {
+    std::string fname = "_buffer_start";
+    std::string real_mode_name = mode_name;
+    real_mode_name = replace_minus_with_underscore(real_mode_name);
+    fname = real_mode_name + fname;
+
+    std::list<std::string> l = {mode_name};
+    g_print("call buffer start func: %s in mode: %s\n", fname.c_str(),
+            mode_name.c_str());
+    call_function(l, fname);
+}
+
+void mode_loader::call_mode_buffer_end_function(std::string& mode_name) {
+    std::string fname = "_buffer_end";
+    std::string real_mode_name = mode_name;
+    real_mode_name = replace_minus_with_underscore(real_mode_name);
+    fname = real_mode_name + fname;
+
+    std::list<std::string> l = {mode_name};
+    g_print("call buffer end func: %s in mode: %s\n", fname.c_str(),
+            mode_name.c_str());
     call_function(l, fname);
 }
 
@@ -104,6 +162,28 @@ std::string& mode_loader::mode_name_to_lib_name(std::string& name) {
     name = fullname;
     g_print("mode name to lib name\n");
     return name;
+}
+
+    bool mode_loader::is_mode_in_buffer_open(std::string& mode_name,
+                                             std::string& buffer_name) {
+    auto range = mode_buffer_map.equal_range(mode_name);
+    for (auto i = range.first; i != range.second; i++) {
+        if (i->second == buffer_name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void mode_loader::erase_mode_buffer_map(std::string& buffer_name,
+                                        std::string& mode_name) {
+    auto range = mode_buffer_map.equal_range(mode_name);
+    for (auto i = range.first; i != range.second; i++) {
+        if (i->second == buffer_name) {
+            g_print("erase element in mode_buffer_map\n");
+            mode_buffer_map.erase(i);
+        }
+    }
 }
 
 }

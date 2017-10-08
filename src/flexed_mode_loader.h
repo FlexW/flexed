@@ -22,8 +22,6 @@ namespace flexed {
  * that can be loaded at run time.
  * The must be saved in a specific location,
  * so that the loader is able to find them.
- *
- * TODO: Implement correct unloading of modules.
  */
 class mode_loader {
 public:
@@ -34,8 +32,11 @@ public:
      * Loads a mode into memory. If the mode is already loaded,
      * it does nothing.
      * @param name Name of the mode.
+     * @returns true if mode successfully loaded. false if not.
      */
-    void load_mode(std::string& name);
+    bool load_mode(std::string& buffer_name, std::string& mode_name);
+
+    void unload_mode(std::string& buffer_name, std::string& mode_name);
 
     /**
      * Calls a function of a loaded mode.
@@ -46,7 +47,10 @@ public:
 
 private:
     /** Stores the handles to all open modes. */
-    std::map<std::string, void*> mode_map;
+    std::multimap<std::string, void*> mode_handle_map;
+
+    /** Stores the name of modes that are open in buffers. */
+    std::multimap<std::string, std::string> mode_buffer_map;
 
     /**
      * Converts a mode name to the real shared library name.
@@ -70,6 +74,10 @@ private:
      */
     void call_mode_start_function(std::string &mode_name);
 
+    bool call_mode_buffer_start_function(std::string& mode_name);
+
+    void call_mode_buffer_end_function(std::string& mode_name);
+
     /**
      * Calls the end function of the mode.
      * This function must always be in the form void MODE_NAME_end(void).
@@ -77,6 +85,10 @@ private:
      * @param mode_name Name of the mode.
      */
     void call_mode_end_function(std::string &mode_name);
+
+    bool is_mode_in_buffer_open(std::string& mode_name, std::string& buffer_name);
+
+    void erase_mode_buffer_map(std::string& buffer_name, std::string& mode_name);
 };
 
 }

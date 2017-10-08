@@ -10,6 +10,11 @@
 
 namespace flexed {
 
+editor& editor::get_instance() {
+    static editor instance;
+    return instance;
+}
+
 editor::editor()
   : main_box(Gtk::ORIENTATION_VERTICAL, 2) {
   set_title("flexed");
@@ -722,9 +727,12 @@ void editor::load_mode() {
 }
 
 void editor::load_mode_callback(Glib::ustring name) {
-    g_print("load mode now\n");
-    fmode_loader.load_mode((std::string&)name);
-    get_active_text_view_buffer()->add_mode((std::string&)name);
+    g_print("try to load mode now\n");
+    if (fmode_loader.load_mode(
+            (std::string&)get_active_text_view_buffer()->get_name(),
+            (std::string&)name)) {
+        get_active_text_view_buffer()->add_mode((std::string&)name);
+    }
 }
 
 void editor::call_mode_function() {
@@ -748,6 +756,9 @@ void editor::unload_mode() {
 void editor::unload_mode_callback(Glib::ustring name) {
     g_print("unload mode now\n");
     get_active_text_view_buffer()->unset_mode((std::string&)name);
+    fmode_loader.unload_mode(
+        (std::string&)get_active_text_view_buffer()->get_name(),
+        (std::string&)name);
 }
 
 }

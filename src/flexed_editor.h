@@ -34,8 +34,14 @@ namespace flexed {
 class editor : public Gtk::Window {
 
 public:
-  editor();
-  virtual ~editor();
+
+    static editor& get_instance();
+
+    virtual ~editor();
+
+    editor(editor const&) = delete;
+
+    void operator=(editor const&) = delete;
 
   /**
    * Gets the signal buffer changed. This signal will be emitted,
@@ -118,6 +124,8 @@ private:
 
   /** Tracks active text view. This may be a nullptr. */
   Gsv::View* active_text_view = nullptr;
+
+  editor();
 
   bool on_key_pressed(GdkEventKey* event);
 

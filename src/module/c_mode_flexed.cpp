@@ -4,12 +4,20 @@
 
 namespace flexed {
 
-char* c_mode_end() {
-    return NULL;
+void c_mode_end() {
+    g_print("c_mode_end() called\n");
 }
 
 void c_mode_start() {
-    g_print("c_mode start_mode() called\n");
+    g_print("c_mode_start() called\n");
+}
+
+void c_mode_buffer_end() {
+    g_print("c_mode_buffer_end() called\n");
+}
+
+void c_mode_buffer_start() {
+    g_print("c_mode_buffer_start() called\n");
 }
 
 void c_mode_dummy1() {
@@ -18,20 +26,6 @@ void c_mode_dummy1() {
 
 void c_mode_dummy2() {
     g_print("c_mode_dummy2() called\n");
-}
-
-c_mode::c_mode() {
-}
-
-c_mode::~c_mode() {
-}
-
-bool c_mode::start() {
-  g_print("start c mode\n");
-  return true;
-}
-
-void c_mode::end() {
 }
 
 }

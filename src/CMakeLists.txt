@@ -19,9 +19,14 @@ include_directories(
   ${Boost_INCLUDE_DIR}
   )
 
-add_executable(
-  flexed
-  main.cpp
+SET(GCC_COVERAGE_LINK_FLAGS "-fPIC")
+SET(
+  CMAKE_EXE_LINKER_FLAGS
+  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}"
+  )
+
+add_library(
+  libflexed SHARED
   flexed_editor.cpp
   flexed_editor.h
   flexed_text_buffer.cpp
@@ -42,7 +47,7 @@ add_executable(
   )
 
 target_link_libraries(
-  flexed
+  libflexed
   ${GTKMM_LIBRARIES}
   ${GTKSOURCEVIEWMM_LIBRARIES}
   ${Boost_LIBRARIES}

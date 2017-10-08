@@ -135,6 +135,8 @@ void insert_key_binding(const std::string& key_binding, stub* val_p) {
     k_map_state3.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1] + kb_split[2], val_p));
   }
 }
+
 };
+
 
 #endif /* KEYBOARD_MAP_H_ */

@@ -12,6 +12,8 @@
 #include "orderd_container.h"
 #include "flexed_text_buffer_container.h"
 
+extern "C" {
+
 namespace flexed {
 
 //class text_buffer;
@@ -62,6 +64,8 @@ private:
    */
   void text_buffer_removed(Glib::RefPtr<text_buffer> buffer);
 };
+
+}
 
 }
 

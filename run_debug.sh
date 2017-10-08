@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./build_debug/src/flexed
+./build_debug/main/flexed

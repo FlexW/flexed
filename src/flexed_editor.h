@@ -12,7 +12,6 @@
 #include <vector>
 #include <gtkmm.h>
 #include <gtksourceviewmm.h>
-
 #include "flexed_text_buffer.h"
 #include "flexed_paned.h"
 #include "flexed_mode_loader.h"

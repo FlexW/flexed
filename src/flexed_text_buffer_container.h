@@ -11,6 +11,8 @@
 #include "orderd_container.h"
 #include "flexed_global_text_buffer_container.h"
 
+extern "C" {
+
 namespace flexed {
 
 class global_text_buffer_container;
@@ -68,6 +70,8 @@ protected:
    */
   virtual void on_previous() override;
 };
+
+}
 
 }
 

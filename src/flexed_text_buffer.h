@@ -14,6 +14,8 @@
 #include "keyboard_map.h"
 #include "flexed_mode.h"
 
+extern "C" {
+
 namespace flexed {
 
 class editor;
@@ -79,6 +81,8 @@ private:
   /** Holds all opened modes, with the handle to the dynamic loaded library. */
   std::list<std::string> mode_list;
 };
+
+}
 
 }
 

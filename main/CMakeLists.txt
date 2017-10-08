@@ -1,11 +1,5 @@
 find_package(PkgConfig)
 
-SET(GCC_COVERAGE_LINK_FLAGS "-fPIC")
-SET(
-  CMAKE_EXE_LINKER_FLAGS
-  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}"
-  )
-
 pkg_check_modules(GTKMM gtkmm-3.0)
 pkg_check_modules(GTKSOURCEVIEWMM gtksourceviewmm-3.0)
 
@@ -19,10 +13,13 @@ include_directories(
   ${GTKSOURCEVIEWMM_INCLUDE_DIRS}
   )
 
-add_library(flexed_smart_parens SHARED smart_parens_flexed.cpp)
+add_executable(
+  flexed
+  main.cpp
+  )
 
 target_link_libraries(
-  flexed_smart_parens
+  flexed
   ${GTKMM_LIBRARIES}
   ${GTKSOURCEVIEWMM_LIBRARIES}
   libflexed

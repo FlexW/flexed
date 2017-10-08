@@ -9,6 +9,8 @@
 #include <map>
 #include <string>
 
+extern "C" {
+
 // The path after which the loader searches for modules.
 #define FLEXED_MODE_PATH "/home/felix/Develop/flexed/build_debug/src/module/"
 
@@ -90,6 +92,8 @@ private:
 
     void erase_mode_buffer_map(std::string& buffer_name, std::string& mode_name);
 };
+
+}
 
 }
 

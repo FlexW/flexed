@@ -37,7 +37,7 @@ bool mode_loader::load_mode(std::string& buffer_name, std::string& mode_name) {
       real_name = replace_minus_with_underscore(real_name);
       fpath += mode_name_to_lib_name(real_name);
       g_print("try to load: %s\n", fpath.c_str());
-      mode_handle = dlopen(fpath.c_str(), RTLD_LAZY);
+      mode_handle = dlopen(fpath.c_str(), RTLD_NOW);
       if (mode_handle == nullptr) {
           g_print("mode not loaded\n");
           return false;

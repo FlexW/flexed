@@ -6,6 +6,9 @@ if [ "$1" = "" ]; then
     echo "Usage:" $0 "MODE_NAME"
 fi
 
+mkdir "$1"
+cd "$1"
+
 MODE_UPPERCASE=$(echo "$1"| awk '{print toupper($0)}')
 MODE_UPPERCASE=$(echo $MODE_UPPERCASE)$(echo "_FLEXED_H_")
 
@@ -51,4 +54,36 @@ extern "C" {
 }
 
 #endif // $MODE_UPPERCASE
+EOF
+
+cat > "CMakeLists.txt" << EOF
+find_package(PkgConfig)
+
+SET(GCC_COVERAGE_LINK_FLAGS "-fPIC")
+SET(
+  CMAKE_EXE_LINKER_FLAGS
+  "\${CMAKE_EXE_LINKER_FLAGS} \${GCC_COVERAGE_LINK_FLAGS}"
+  )
+
+pkg_check_modules(GTKMM gtkmm-3.0)
+pkg_check_modules(GTKSOURCEVIEWMM gtksourceviewmm-3.0)
+
+link_directories(
+  \${GTKMM_LIBRARY_DIRS}
+  \${GTKSOURCEVIEWMM_LIBRARY_DIRS}
+  )
+
+include_directories(
+  \${GTKMM_INCLUDE_DIRS}
+  \${GTKSOURCEVIEWMM_INCLUDE_DIRS}
+  )
+
+add_library(flexed_$1 SHARED $1_flexed.cpp)
+
+target_link_libraries(
+  flexed_$1
+  \${GTKMM_LIBRARIES}
+  \${GTKSOURCEVIEWMM_LIBRARIES}
+  libflexed
+  )
 EOF

@@ -42,14 +42,27 @@ namespace flexed {
 
         /**
          * Gets the signal buffer changed. This signal will be emitted,
-         * every time a buffer changes. Sometimes the changed buffer will be the same.
+         * every time a buffer changes.
+         * Sometimes the changed buffer will be the same.
          * @returns Signal buffer changed.
          */
-        sigc::signal<void> signal_buffer_changed();
+        sigc::signal<void>& signal_buffer_changed();
 
-        sigc::signal<Gsv::View*> signal_text_view_created();
+        /**
+         * Gets the signal text view created.
+         * This signal will be emitted,
+         * every time a text view gets created.
+         * @returns Signal text view created.
+         */
+        sigc::signal<Gsv::View&>& signal_text_view_created();
 
-        sigc::signal<Gsv::View*> signal_text_view_removed();
+        /**
+         * Gets the signal text view removed.
+         * This signal will be emitted,
+         * every time a text view gets removed.
+         * @returns Signal text view removed.
+         */
+        sigc::signal<Gsv::View&>& signal_text_view_removed();
 
         /**
          * Gets the buffer of the status bar.
@@ -62,12 +75,6 @@ namespace flexed {
          * @returns Buffer.
          */
         Glib::RefPtr<text_buffer> get_active_text_view_buffer();
-
-        /**
-         * Sets the divider of the active paned widget.
-         * @param pos Divider position. Must be between 0 and 100.
-         */
-        void set_divider_from_active_paned(int pos);
 
         /**
          * Gets input from the command bar.
@@ -110,61 +117,102 @@ namespace flexed {
          */
         Gsv::View* get_status_bar();
 
-    private:
-        typedef void *instance_ptr;
-        typedef void (*internal_function)(instance_ptr, Glib::ustring);
-        typedef std::pair<instance_ptr, internal_function>  stub;
-
-        mode_loader fmode_loader;
-
-        sigc::signal<void> sig_buffer_changed;
-
-        sigc::signal<Gsv::View*> sig_text_view_created;
-
-        sigc::signal<Gsv::View*> sig_text_view_removed;
-
-        stub* cmd_bar_callback_stub = nullptr;
-        //std::function<void(Glib::ustring)> cmd_bar_callback = nullptr;
-        keyboard_handler keyboard;
-
-        /** Global keyboard map. */
-        std::shared_ptr<keyboard_map> g_keyboard_map;
-
-        /** Command bar keyboard map. */
-        std::shared_ptr<keyboard_map> cmd_bar_keyboard_map;
-
-        Gtk::Box  main_box;
-        Gsv::View cmd_bar;
-        Gsv::View status_bar;
-
-        Glib::RefPtr<Gsv::Buffer::Tag> no_editable_tag;
-
-        Glib::RefPtr<text_buffer> first_buffer;
-        Glib::RefPtr<text_buffer>   cmd_bar_buffer;
-
-        /** Counts current opend text views. */
-        int text_view_count = 1;
-
-        /** Stores all open buffers.*/
-        std::shared_ptr<global_text_buffer_container> g_text_buffer_container;
-
-        /** Stores all open TextViews with their buffer container. */
-        std::map<Gsv::View*, text_buffer_container*> text_view_map;
-
-        /** Tracks active text view. This may be a nullptr. */
-        Gsv::View* active_text_view = nullptr;
-
-        editor();
-
         /**
-         * This is the editors entry point.
-         * Set ups the window for editing.
+         * Gets the command bars buffer.
+         * @returns Command bar buffer.
          */
-        void init_editor();
-
-        bool on_key_pressed(GdkEventKey* event);
+        Glib::RefPtr<text_buffer> get_cmd_bar_buffer();
 
         /**
+         * Returns the editors keyboard map.
+         * @returns Keyboard map.
+         */
+        std::shared_ptr<keyboard_map> get_keyboard_map();
+
+        /**
+         * Sets the divider of the active paned widget.
+         * @param pos Divider position. Must be between 0 and 100.
+         */
+        void set_divider_from_active_paned(int pos);
+
+        /**
+         * Sets a message in the command bar.
+         */
+        void set_cmd_bar_msg(const Glib::ustring& msg);
+
+        /**
+         * Opens a text file.
+         * Creates a buffer for the file,
+         * takes care that not one file is opend twice.
+         * Gets input string from cmd_bar text view.
+         */
+        void open_file_prompt();
+
+        /**
+         * Opens a text file.
+         * @param fname File name.
+         */
+        void open_file(Glib::ustring fname);
+
+        /**
+         * Prompts the user for loading a mode.
+         */
+        void load_mode_prompt();
+
+        /**
+         * Loads a mode after the user typed in a mode.
+         * @name Mode name.
+         */
+        void load_mode(Glib::ustring name);
+
+        /**
+         * Prompts the user for calling a function of a mode.
+         */
+        void call_mode_function_prompt();
+
+        /**
+         * Calls a function of mode after the user typed in a mode.
+         * @name Function name
+         */
+        void call_mode_function(Glib::ustring name);
+
+        /**
+         * Prompts the user for unloading a mode.
+         */
+        void unload_mode_prompt();
+
+        /**
+         * Unloads a mode after the user typed in one.
+         * @param name Mode name.
+         */
+        void unload_mode(Glib::ustring name);
+
+        /**
+         * Saves a file under current name.
+         */
+        void save_file();
+
+        /**
+         * Exits the editor.
+         */
+        void quit();
+
+        /**
+         * Clears the command bar.
+         */
+        void clear_cmd_bar();
+
+        /**
+         * Aborts current command. Clears command bar.
+         */
+        void abort_cmd();
+
+        /**
+         * Focuses the command bar.
+         */
+        void focus_cmd_bar();
+
+                /**
          * Inserts new paned in horizontal direction.
          */
         void insert_paned_horizontal();
@@ -186,7 +234,8 @@ namespace flexed {
          * @param active Active ScrolledWindow.
          * @param Split direction.
          */
-        void insert_first_paned(Gtk::ScrolledWindow* active, Gtk::Orientation orientation);
+        void insert_first_paned(Gtk::ScrolledWindow* active,
+                                Gtk::Orientation orientation);
 
         /**
          * Inserts any other paned widget if a paned wiget has already placed.
@@ -194,7 +243,8 @@ namespace flexed {
          * @param active Active ScrolledWindow.
          * @param Split direction.
          */
-        void insert_other_paned(Gtk::ScrolledWindow* active, Gtk::Orientation orientation);
+        void insert_other_paned(Gtk::ScrolledWindow* active,
+                                Gtk::Orientation orientation);
 
         /**
          * Places the divider from active paned widget in the middle.
@@ -252,6 +302,99 @@ namespace flexed {
                                 Gsv::View* active_tv);
 
         /**
+         * Switches active editor_text_view to the previous buffer.
+         */
+        void switch_to_previous_buffer();
+
+        /**
+         * Switches active editor_text_view to the next buffer.
+         */
+        void switch_to_next_buffer();
+
+        /**
+         * If a text view upper the active text view exists,
+         * it switches to that.
+         */
+        void switch_paned_up();
+
+        /**
+         * If a text view lower the active text view exists,
+         * it switches to that.
+         */
+        void switch_paned_down();
+
+        /**
+         * If a text view left of the active text view exists,
+         * it switches to that.
+         */
+        void switch_paned_left();
+
+        /**
+         * If a text view right of the active text view exists,
+         * it switches to that.
+         */
+        void switch_paned_right();
+
+    private:
+        typedef void *instance_ptr;
+        typedef void (*internal_function)(instance_ptr, Glib::ustring);
+        typedef std::pair<instance_ptr, internal_function>  stub;
+
+        mode_loader fmode_loader;
+
+        sigc::signal<void> sig_buffer_changed;
+
+        sigc::signal<Gsv::View&> sig_text_view_created;
+
+        sigc::signal<Gsv::View&> sig_text_view_removed;
+
+        stub* cmd_bar_callback_stub = nullptr;
+        //std::function<void(Glib::ustring)> cmd_bar_callback = nullptr;
+        keyboard_handler keyboard;
+
+        /** Global keyboard map. */
+        std::shared_ptr<keyboard_map> g_keyboard_map;
+
+        /** Command bar keyboard map. */
+        std::shared_ptr<keyboard_map> cmd_bar_keyboard_map;
+
+        Gtk::Box  main_box;
+        Gsv::View cmd_bar;
+        Gsv::View status_bar;
+
+        Glib::RefPtr<Gsv::Buffer::Tag> no_editable_tag;
+
+        Glib::RefPtr<text_buffer> first_buffer;
+        Glib::RefPtr<text_buffer>   cmd_bar_buffer;
+
+        /** Counts current opend text views. */
+        int text_view_count = 1;
+
+        /** Stores all open buffers.*/
+        std::shared_ptr<global_text_buffer_container> g_text_buffer_container;
+
+        /** Stores all open TextViews with their buffer container. */
+        std::map<Gsv::View*, text_buffer_container*> text_view_map;
+
+        /** Tracks active text view. This may be a nullptr. */
+        Gsv::View* active_text_view = nullptr;
+
+        editor();
+
+        /**
+         * This is the editors entry point.
+         * Set ups the window for editing.
+         */
+        void init_editor();
+
+        bool on_key_pressed(GdkEventKey* event);
+
+        /**
+         * Gets called when the active buffer changes.
+         */
+        void on_buffer_changed();
+
+        /**
          * Removes a text view entry from the text_view_map.
          * Frees the buffer_container. TextView gets not freed.
          * @param view TextView to remove.
@@ -268,16 +411,6 @@ namespace flexed {
         void add_text_view_to_map(Gsv::View*view,
                                   orderd_container<Glib::RefPtr <text_buffer> >&
                                   old_container);
-
-        /**
-         * Opens a text file.
-         * Creates a buffer for the file,
-         * takes care that not one file is opend twice.
-         * Gets input string from cmd_bar text view.
-         */
-        void open_file();
-
-        void open_file_callback(Glib::ustring fname);
 
         /**
          * This signal handler is connected with every editor_text_view.
@@ -305,40 +438,10 @@ namespace flexed {
         Glib::RefPtr<text_buffer> create_text_buffer(std::string& buffer_name);
 
         /**
-         * Switches active editor_text_view to the previous buffer.
-         */
-        void switch_to_previous_buffer();
-
-        /**
-         * Switches active editor_text_view to the next buffer.
-         */
-        void switch_to_next_buffer();
-
-        /**
          * Resets the active text view to nullptr if tv matches.
          * @param tv Text view.
          */
         void reset_active_text_view(Gtk::Widget* tv);
-
-        /**
-         * If a text view upper the active text view exists, it switches to that.
-         */
-        void switch_paned_up();
-
-        /**
-         * If a text view lower the active text view exists, it switches to that.
-         */
-        void switch_paned_down();
-
-        /**
-         * If a text view left of the active text view exists, it switches to that.
-         */
-        void switch_paned_left();
-
-        /**
-         * If a text view right of the active text view exists, it switches to that.
-         */
-        void switch_paned_right();
 
         /**
          * Searches for a text view in a paneds child1.
@@ -412,11 +515,6 @@ namespace flexed {
         paned* get_parent_paned(paned* ppaned);
 
         /**
-         * Focuses the command bar.
-         */
-        void focus_cmd_bar();
-
-        /**
          * Executes a command in the command bar.
          */
         void execute_cmd();
@@ -427,74 +525,6 @@ namespace flexed {
         void class_method_stub(instance_ptr instance, Glib::ustring data) {
             return (static_cast<C*>(instance)->*handler)(data);
         }
-
-        /**
-         * Clears the command bar.
-         */
-        void clear_cmd_bar();
-
-        /**
-         * Aborts current command. Clears command bar.
-         */
-        void abort_cmd();
-
-        /**
-         * Sets a message in the command bar.
-         */
-        void set_cmd_bar_msg(const Glib::ustring& msg);
-
-        /**
-         * Saves a file under current name.
-         */
-        void save_file();
-
-        /**
-         * Exits the editor.
-         */
-        void quit();
-
-        /**
-         * Gets called when the active buffer changes.
-         */
-        void on_buffer_changed();
-
-        /**
-         * Gets the command bars buffer.
-         * @returns Command bar buffer.
-         */
-        Glib::RefPtr<text_buffer> get_cmd_bar_buffer();
-
-        /**
-         * Prompts the user for loading a mode.
-         */
-        void load_mode();
-
-        /**
-         * Loads a mode after the user typed in a mode.
-         * @name Mode name.
-         */
-        void load_mode_callback(Glib::ustring name);
-
-        /**
-         * Prompts the user for calling a function of a mode.
-         */
-        void call_mode_function();
-
-        /**
-         * Calls a function of mode after the user typed in a mode.
-         */
-        void call_mode_function_callback(Glib::ustring name);
-
-        /**
-         * Prompts the user for unloading a mode.
-         */
-        void unload_mode();
-
-        /**
-         * Unloads a mode after the user typed in one.
-         * @param name Mode name.
-         */
-        void unload_mode_callback(Glib::ustring name);
     };
 }
 

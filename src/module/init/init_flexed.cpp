@@ -12,7 +12,7 @@ void init_end() {
 void init_start() {
     g_print("init_start() called\n");
     auto g_keyboard_map = editor::get_instance().get_keyboard_map();
-
+    g_print("init_start() end\n");
     g_keyboard_map->set_key_binding<editor, &editor::insert_paned_horizontal>(
         "Cx2", &editor::get_instance());
 

@@ -591,10 +591,6 @@ namespace flexed {
             .connect(sigc::mem_fun(*this, &editor::on_key_pressed), false);
         signal_buffer_changed()
             .connect(sigc::mem_fun(*this, &editor::on_buffer_changed));
-
-        std::string init_mode_name = "init";
-        std::string init_buffer_name = "*INIT*";
-        fmode_loader.load_mode(init_buffer_name, init_mode_name);
     }
 
     void editor::remove_text_view_from_map(Gsv::View* view) {
@@ -621,6 +617,13 @@ namespace flexed {
     }
 
     bool editor::on_text_view_focus_changed(GdkEventFocus* focus_event) {
+        if (start) {
+            std::string init_mode_name = "init";
+            std::string init_buffer_name = "*INIT*";
+            fmode_loader.load_mode(init_buffer_name, init_mode_name);
+            start = false;
+            fmode_loader.unload_mode(init_buffer_name, init_mode_name);
+        }
         active_text_view = static_cast<Gsv::View*>(get_focus());
         auto buffer = active_text_view->get_buffer();
         auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);

@@ -340,6 +340,9 @@ namespace flexed {
         typedef void (*internal_function)(instance_ptr, Glib::ustring);
         typedef std::pair<instance_ptr, internal_function>  stub;
 
+        /** Indicates if the editor is starting. */
+        bool start = true;
+
         mode_loader fmode_loader;
 
         sigc::signal<void> sig_buffer_changed;

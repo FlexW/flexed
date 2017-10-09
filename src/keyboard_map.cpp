@@ -12,7 +12,7 @@ void keyboard_map::remove_key_binding(const std::string& key_binding) {
 }
 
 int keyboard_map::call_handler(const std::string& key_binding) {
-  if (key_binding.size() <= 2) {
+    if (key_binding.size() <= 2) {
     auto iter = k_map_state1.find(key_binding);
     if (iter == k_map_state1.end())
       return -1;
@@ -31,6 +31,9 @@ int keyboard_map::call_handler(const std::string& key_binding) {
     if (func == nullptr) {
       return 2;
     }
+    g_print("func p: %p\n", func);
+    g_print("func->second p: %p\n", func->second);
+    g_print("func->first p: %p\n", func->first);
     func->second(func->first);
     return 0;
   }

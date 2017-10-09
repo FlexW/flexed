@@ -28,7 +28,14 @@ namespace flexed {
 class mode_loader {
 public:
     mode_loader();
+
     virtual ~mode_loader();
+
+    /**
+     * Sets the path where the loader looks after modes.
+     * @path Path.
+     */
+    void set_mode_search_path(std::string& path);
 
     /**
      * Loads a mode into memory. If the mode is already loaded,
@@ -48,6 +55,10 @@ public:
     void call_function(std::list<std::string>& mode_list, std::string& name);
 
 private:
+
+    /** Mode search path. */
+    std::string mode_search_path;
+
     /** Stores the handles to all open modes. */
     std::multimap<std::string, void*> mode_handle_map;
 

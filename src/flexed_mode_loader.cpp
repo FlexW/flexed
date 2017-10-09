@@ -41,8 +41,9 @@ namespace flexed {
             std::string real_name = mode_name;
             std::string fpath = FLEXED_MODE_PATH;
             real_name = replace_minus_with_underscore(real_name);
-            fpath += mode_name + "/";
-            fpath += mode_name_to_lib_name(real_name);
+            fpath += real_name + "/";
+            std::string lib_name = real_name;
+            fpath += mode_name_to_lib_name(lib_name);
             g_print("try to load: %s\n", fpath.c_str());
             mode_handle = dlopen(fpath.c_str(), RTLD_NOW);
             if (mode_handle == nullptr) {

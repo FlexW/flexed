@@ -10,53 +10,53 @@ void init_end() {
 }
 
 void init_start() {
+    g_print("editor instance in init: %p\n", editor::get_instance());
     g_print("init_start() called\n");
-    auto g_keyboard_map = editor::get_instance().get_keyboard_map();
+    auto g_keyboard_map = editor::get_instance()->get_keyboard_map();
     g_print("init_start() end\n");
     g_keyboard_map->set_key_binding<editor, &editor::insert_paned_horizontal>(
-        "Cx2", &editor::get_instance());
+        "Cx2", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::insert_paned_vertical>(
-        "Cx3", &editor::get_instance());
+        "Cx3", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::remove_paned>(
-        "Cx1", &editor::get_instance());
+        "Cx1", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::open_file_prompt>(
-        "CxCf", &editor::get_instance());
+        "CxCf", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_to_next_buffer>(
-        "CxR", &editor::get_instance());
+        "CxR", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_to_previous_buffer>(
-        "CxL", &editor::get_instance());
+        "CxL", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_paned_up>(
-        "SU", &editor::get_instance());
+        "SU", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_paned_down>(
-        "SD", &editor::get_instance());
+        "SD", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_paned_left>(
-        "SL", &editor::get_instance());
+        "SL", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_paned_right>(
-        "SR", &editor::get_instance());
+        "SR", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::call_mode_function_prompt>(
-        "Ax", &editor::get_instance());
+        "Ax", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::save_file>(
-        "CxCs", &editor::get_instance());
+        "CxCs", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::quit>(
-        "CxCq", &editor::get_instance());
-
+        "CxCq", editor::get_instance());
     g_keyboard_map->set_key_binding<editor, &editor::load_mode_prompt>(
-        "CmCl", &editor::get_instance());
+        "CmCl", editor::get_instance());
 
     g_keyboard_map->set_key_binding<editor, &editor::unload_mode_prompt>(
-        "CmCu", &editor::get_instance());
+        "CmCu", editor::get_instance());
 }
 
 void init_buffer_end() {

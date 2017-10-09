@@ -7,5 +7,5 @@ int main(int argc, char *argv[]) {
   //Shows the window and returns when it is closed.
   //flexed::editor ed;
   //return app->run(ed);
-  return app->run(flexed::editor::get_instance());
+  return app->run(*flexed::editor::get_instance());
 }

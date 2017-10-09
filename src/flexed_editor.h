@@ -12,6 +12,7 @@
 #include <vector>
 #include <gtkmm.h>
 #include <gtksourceviewmm.h>
+
 #include "flexed_text_buffer.h"
 #include "flexed_paned.h"
 #include "flexed_mode_loader.h"
@@ -19,11 +20,14 @@
 #include "orderd_container.h"
 #include "flexed_global_text_buffer_container.h"
 #include "flexed_text_buffer_container.h"
+#include "flexed_status_bar_view.h"
 
 #define CMD_BAR_PROMPT_SEPERATOR_LEN 4
-#define CMD_BAR_PROMPT_SEPERATOR     " >> "
+#define CMD_BAR_PROMPT_SEPERATOR " >> "
 
 namespace flexed {
+
+    class status_bar_view;
 
     /**
      * Represents the editor window.
@@ -32,7 +36,7 @@ namespace flexed {
 
     public:
 
-        static editor& get_instance();
+        static editor* get_instance();
 
         virtual ~editor();
 
@@ -68,7 +72,7 @@ namespace flexed {
          * Gets the buffer of the status bar.
          * @returns Buffer.
          */
-        Glib::RefPtr<Gtk::TextBuffer> get_status_bar_buffer();
+        Glib::RefPtr<text_buffer> get_status_bar_buffer();
 
         /**
          * Gets the buffer of the active text view.
@@ -78,17 +82,20 @@ namespace flexed {
 
         /**
          * Gets input from the command bar.
-         * A callback must be specified which gets called if the user pressed RETURN.
+         * A callback must be specified which gets called if the user
+         * pressed RETURN.
          * To this callback the user input gets routed.
-         * @param prompt A String that gets prompted to the user in the command bar.
+         * @param prompt A String that gets prompted to the user in the
+         * command bar.
          */
         template<class C, void (C::*callback)(Glib::ustring)>
         void get_cmd_bar_input(const Glib::ustring& prompt, C* instance) {
             focus_cmd_bar();
             auto s = new stub(instance, &class_method_stub<C, callback>);
-            cmd_bar.get_buffer()->insert_with_tag(cmd_bar.get_buffer()->begin(),
-                                                  prompt + CMD_BAR_PROMPT_SEPERATOR,
-                                                  no_editable_tag);
+            cmd_bar.get_buffer()->insert_with_tag(
+                cmd_bar.get_buffer()->begin(),
+                prompt + CMD_BAR_PROMPT_SEPERATOR,
+                no_editable_tag);
             cmd_bar_callback_stub = s;
         }
 
@@ -115,7 +122,7 @@ namespace flexed {
          * Returns the editors status bar.
          * @returns Status bar.
          */
-        Gsv::View* get_status_bar();
+        status_bar_view* get_status_bar();
 
         /**
          * Gets the command bars buffer.
@@ -275,7 +282,8 @@ namespace flexed {
                             Gtk::Orientation orientation);
 
         /**
-         * If there are paned widgets, then this method will remove the active one.
+         * If there are paned widgets,
+         * then this method will remove the active one.
          */
         void remove_paned();
 
@@ -363,7 +371,8 @@ namespace flexed {
 
         Gtk::Box  main_box;
         Gsv::View cmd_bar;
-        Gsv::View status_bar;
+        //Gsv::View status_bar;
+        status_bar_view* status_bar;
 
         Glib::RefPtr<Gsv::Buffer::Tag> no_editable_tag;
 

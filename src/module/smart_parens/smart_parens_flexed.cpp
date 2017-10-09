@@ -26,19 +26,19 @@ void smart_parens_buffer_start() {
 }
 
 void smart_parens::init_key_bindings() {
-    editor::get_instance().get_active_text_view_buffer()->get_keyboard_map()
+    editor::get_instance()->get_active_text_view_buffer()->get_keyboard_map()
         ->set_key_binding<smart_parens, &smart_parens::add_closing_paren>(
             "S(", instance);
 }
 
 void smart_parens::remove_key_bindings() {
-    editor::get_instance().get_active_text_view_buffer()->get_keyboard_map()
+    editor::get_instance()->get_active_text_view_buffer()->get_keyboard_map()
         ->remove_key_binding("S(");
 }
 
 void smart_parens::add_closing_paren() {
     g_print("add_closing_paren() called\n");
-    auto buffer = editor::get_instance().get_active_text_view_buffer();
+    auto buffer = editor::get_instance()->get_active_text_view_buffer();
     buffer->insert_at_cursor("()");
 
     auto insert_iter = buffer->get_iter_at_mark(buffer->get_insert());

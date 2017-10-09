@@ -39,6 +39,8 @@ add_library(
   flexed_text_buffer_container.h
   flexed_mode_loader.cpp
   flexed_mode_loader.h
+  flexed_status_bar_view.cpp
+  flexed_status_bar_view.h
   orderd_container.h
   keyboard_handler.cpp
   keyboard_handler.h

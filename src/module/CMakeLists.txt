@@ -1,3 +1,2 @@
-add_subdirectory(
-  init
-  smart_parens)
+add_subdirectory(smart_parens)
+add_subdirectory(init)

@@ -20,9 +20,16 @@ namespace flexed {
 
         virtual ~status_bar_view();
 
+        Gtk::Box& get_main_box();
+
         void set_filename(std::string& name);
 
+        void set_file_stats(std::string& stats);
+
     private:
+        Gtk::Box main_box;
+        Gtk::TextView filename_text_view;
+        Gtk::TextView file_stats_text_view;
 
         Glib::RefPtr<text_buffer> status_bar_buffer;
     };

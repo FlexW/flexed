@@ -4,6 +4,7 @@
 
 if [ "$1" = "" ]; then
     echo "Usage:" $0 "MODE_NAME"
+    exit
 fi
 
 mkdir "$1"
@@ -87,3 +88,5 @@ target_link_libraries(
   libflexed
   )
 EOF
+
+echo "add_subdirectory($1)" >> ../CMakeLists.txt

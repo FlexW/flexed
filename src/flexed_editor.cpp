@@ -73,6 +73,19 @@ namespace flexed {
         return g_keyboard_map;
     }
 
+    std::list<Gsv::View*> editor::get_text_views() {
+        std::list<Gsv::View*> list;
+        for (auto p : text_view_map) {
+            list.push_back(p.first);
+        }
+        return list;
+    }
+
+    std::shared_ptr<global_text_buffer_container>
+    editor::get_global_text_buffer_container() {
+        return g_text_buffer_container;
+    }
+
     void editor::set_divider_from_active_paned(int pos) {
         if (pos > 100 || pos < 0)
             return;
@@ -794,12 +807,14 @@ namespace flexed {
 
     void editor::on_buffer_changed() {
         g_print("signal buffer changed\n");
-        status_bar->set_filename(
-            (std::string&)get_active_text_view_buffer()->get_name());
+        //status_bar->set_filename(
+        //    (std::string&)get_active_text_view_buffer()->get_name());
         //get_status_bar_buffer()
         //    ->set_text("    " + get_active_text_view_buffer()->get_name());
         keyboard.set_keyboard_map(
             get_active_text_view_buffer()->get_keyboard_map());
+        status_bar->set_file_stats();
+        status_bar->set_filename();
     }
 
     bool editor::on_key_pressed(GdkEventKey* key_event) {

@@ -137,6 +137,18 @@ namespace flexed {
         std::shared_ptr<keyboard_map> get_keyboard_map();
 
         /**
+         * Returns a list of all open text views.
+         * @returns text view list.
+         */
+        std::list<Gsv::View*> get_text_views();
+
+        /**
+         * Returns the global text buffer container.
+         */
+        std::shared_ptr<global_text_buffer_container>
+        get_global_text_buffer_container();
+
+        /**
          * Sets the divider of the active paned widget.
          * @param pos Divider position. Must be between 0 and 100.
          */

@@ -22,9 +22,9 @@ namespace flexed {
 
         Gtk::Box& get_main_box();
 
-        void set_filename(std::string& name);
+        void set_filename();
 
-        void set_file_stats(std::string& stats);
+        void set_file_stats();
 
     private:
         Gtk::Box main_box;

@@ -54,7 +54,21 @@ namespace flexed{
     }
 
     void status_bar_view::set_file_stats() {
-        std::string stats = "filestats";
+        auto buffer = editor::get_instance()->get_active_text_view_buffer();
+        auto cursor_mark = buffer->get_insert();
+        auto iter = buffer->get_iter_at_mark(cursor_mark);
+        g_print("line in buffer %d\n", iter.get_line());
+
+        int line_num = iter.get_line() + 1;
+        int line_count = buffer->get_line_count();
+        float fline_num_procent = ((float)line_num / (float)line_count * 100.0);
+
+        int line_num_procent = (int)fline_num_procent;
+        std::string stats = std::to_string(line_num_procent) + " %";
+
+        if (buffer->get_modified()) {
+            stats += " *";
+        }
         file_stats_text_view.get_buffer()->set_text(stats);
     }
 }

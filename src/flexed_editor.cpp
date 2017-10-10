@@ -86,6 +86,10 @@ namespace flexed {
         return g_text_buffer_container;
     }
 
+    Gsv::View* editor::get_active_text_view() {
+        return active_text_view;
+    }
+
     void editor::set_divider_from_active_paned(int pos) {
         if (pos > 100 || pos < 0)
             return;
@@ -106,9 +110,14 @@ namespace flexed {
         cmd_bar.get_buffer()->set_text(msg);
     }
 
+    void
+    editor::set_ask_for_save_file_buffer(Glib::RefPtr<text_buffer> buffer) {
+        ask_for_save_file_buffer = buffer;
+    }
+
     void editor::open_file_prompt() {
         get_cmd_bar_input<editor, &editor::open_file>("Open file",
-                                                               this);
+                                                      this);
     }
 
     void editor::open_file(Glib::ustring fname) {
@@ -150,6 +159,9 @@ namespace flexed {
         }
         auto buf_container = text_view_map.find(active_text_view)->second;
         buf_container->previous();
+
+        new_buffer->set_modified(false);
+        status_bar->set_file_stats();
     }
 
         void editor::load_mode_prompt() {
@@ -194,17 +206,71 @@ namespace flexed {
         set_cmd_bar_msg(name + " unloaded");
     }
 
+    void editor::ask_for_save_prompt() {
+        get_cmd_bar_input<editor, &editor::ask_for_save>(
+            ask_for_save_file_buffer->get_name()
+            + " | File modified. Save? [y/n]", this);
+    }
+
+    void editor::ask_for_save(Glib::ustring y_or_n) {
+        int y_or_n_flag = check_yes_or_no(y_or_n);
+        if (y_or_n_flag == 1) {
+            //if (ask_for_save_file_buffer == nullptr) {
+            //    save_file();
+            //}
+            //else {
+            save_file(ask_for_save_file_buffer);
+                //}
+            //ask_for_save_file_buffer = nullptr;
+        }
+        else if (y_or_n_flag == 0) {
+            ask_for_save_file_buffer->set_modified(false);
+        }
+        else if (y_or_n_flag == -1) {
+            g_print("not y or no \n");
+            ask_for_save_prompt();
+            return;
+        }
+        g_print("exit_editor_flag: %d\n", exit_editor_flag);
+        if (exit_editor_flag) {
+            g_print("call quit again\n");
+            quit();
+        }
+    }
+
+    int editor::check_yes_or_no(std::string y_or_n) {
+        if (y_or_n == "yes") {
+            return 1;
+        }
+        else if (y_or_n == "y") {
+            return 1;
+        }
+        else if (y_or_n == "no") {
+            return 0;
+        }
+        if (y_or_n == "n") {
+            return 0;
+        }
+        else {
+            return -1;
+        }
+    }
+
     void editor::save_file() {
-        auto buffer = active_text_view->get_buffer();
-        auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
-        auto fname = tbuffer->get_name();
+        save_file(get_active_text_view_buffer());
+    }
+
+    void editor::save_file(Glib::RefPtr<text_buffer> buffer) {
+        auto fname = buffer->get_name();
         g_print("save file as: %s\n", fname.c_str());
         std::ofstream tfile(fname);
         if (tfile.is_open()) {
-            tfile << tbuffer->get_text();
+            tfile << buffer->get_text();
             tfile.close();
             set_cmd_bar_msg("Save successfully");
             g_print("file saved.\n");
+            get_active_text_view_buffer()->set_modified(false);
+            status_bar->set_file_stats();
             return;
         }
         set_cmd_bar_msg("Save failed!");
@@ -213,6 +279,10 @@ namespace flexed {
 
     void editor::quit() {
         g_print("quit\n");
+        exit_editor_flag = true;
+        if (!check_buffers_saved()) {
+            return;
+        }
         close();
     }
 
@@ -573,7 +643,6 @@ namespace flexed {
 
         g_text_buffer_container
             = std::make_shared<global_text_buffer_container>();
-        first_buffer = Glib::RefPtr<text_buffer>(new text_buffer(this));
         cmd_bar_buffer = Glib::RefPtr<text_buffer>(new text_buffer(this));
         g_keyboard_map = std::make_shared<keyboard_map>();
         cmd_bar_keyboard_map = std::make_shared<keyboard_map>();
@@ -581,9 +650,16 @@ namespace flexed {
 
         cmd_bar_buffer->set_keyboard_map(cmd_bar_keyboard_map);
 
+        std::string first_buffer_name("*HOME*");
+        first_buffer = Glib::RefPtr<text_buffer>(new text_buffer(this));
+        //first_buffer = create_text_buffer(first_buffer_name);
         first_buffer->set_text("Welcome to the flexed text editor.");
-        first_buffer->set_name("*WELCOME*");
+        first_buffer->set_modified(false);
+        first_buffer->set_name(first_buffer_name);
         first_buffer->set_keyboard_map(g_keyboard_map);
+        auto cur_pos_prop = first_buffer->property_cursor_position();
+        cur_pos_prop.signal_changed().connect(
+            sigc::mem_fun(*status_bar, &status_bar_view::set_file_stats));
         g_text_buffer_container->add(first_buffer);
 
         main_box.pack_start(*create_text_view());
@@ -674,6 +750,10 @@ namespace flexed {
         g_text_buffer_container->add(
             static_cast< Glib::RefPtr<text_buffer> >(new_buffer));
         new_buffer->set_keyboard_map(g_keyboard_map);
+
+        auto cur_pos_prop = new_buffer->property_cursor_position();
+        cur_pos_prop.signal_changed().connect(
+            sigc::mem_fun(*status_bar, &status_bar_view::set_file_stats));
         return new_buffer;
     }
 
@@ -818,6 +898,22 @@ namespace flexed {
     }
 
     bool editor::on_key_pressed(GdkEventKey* key_event) {
+        //status_bar->set_file_stats();
         return keyboard.on_key_pressed(key_event);
+    }
+
+    bool editor::check_buffers_saved() {
+        auto buffer_vec = g_text_buffer_container->get_obj_vec();
+        for (auto buffer : buffer_vec) {
+            g_print("buffer: %s modified: %d\n", buffer->get_name().c_str(),
+                    buffer->get_modified());
+            if (buffer->get_modified()) {
+                g_print("ask now for save\n");
+                ask_for_save_file_buffer = buffer;
+                ask_for_save_prompt();
+                return false;
+            }
+        }
+        return true;
     }
 }

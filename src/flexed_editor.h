@@ -97,6 +97,7 @@ namespace flexed {
                 prompt + CMD_BAR_PROMPT_SEPERATOR,
                 no_editable_tag);
             cmd_bar_callback_stub = s;
+            g_print("get_cmd_bar_input returned\n");
         }
 
         /**
@@ -149,6 +150,12 @@ namespace flexed {
         get_global_text_buffer_container();
 
         /**
+         * Returns the active text view.
+         * @returns Active text view.
+         */
+        Gsv::View* get_active_text_view();
+
+        /**
          * Sets the divider of the active paned widget.
          * @param pos Divider position. Must be between 0 and 100.
          */
@@ -158,6 +165,13 @@ namespace flexed {
          * Sets a message in the command bar.
          */
         void set_cmd_bar_msg(const Glib::ustring& msg);
+
+        /**
+         * Sets the ask_for_save_file_buffer, that gets checked by
+         * ask_for_save_file()
+         * @param buffer Text buffer.
+         */
+        void set_ask_for_save_file_buffer(Glib::RefPtr<text_buffer> buffer);
 
         /**
          * Opens a text file.
@@ -207,9 +221,40 @@ namespace flexed {
         void unload_mode(Glib::ustring name);
 
         /**
-         * Saves a file under current name.
+         * Asks the user if he/she wants to save a file.
+         * One can specify the buffer to save in the variable
+         * ask_for_save_file_buffer .
+         * @see set_ask_for_save_file_buffer()
+         */
+        void ask_for_save_prompt();
+
+        /**
+         * Saves a file if the user wants it.
+         * Checks the editors ext flag, in case it is set. The editor exits.
+         * @param y_or_n If yes or y file gets saved, if n or no, then not.
+         */
+        void ask_for_save(Glib::ustring y_or_n);
+
+        /**
+         * Checks if the string is yes , y , no , n.
+         * On yes , y returns true.
+         * On no , n return false.
+         * Everything else returns -1.
+         * @param y_or_n yes or no string.
+         * @returns Code.
+         */
+        int check_yes_or_no(std::string y_or_n);
+
+        /**
+         * Saves a the active buffers file under current name.
          */
         void save_file();
+
+        /**
+         * Saves the buffers content to a file.
+         * @param buffer Buffer to save.
+         */
+        void save_file(Glib::RefPtr<text_buffer> buffer);
 
         /**
          * Exits the editor.
@@ -403,6 +448,11 @@ namespace flexed {
         /** Tracks active text view. This may be a nullptr. */
         Gsv::View* active_text_view = nullptr;
 
+        /** Inidicates if the editor wants to exit. */
+        bool exit_editor_flag = false;
+
+        Glib::RefPtr<text_buffer> ask_for_save_file_buffer;
+
         editor();
 
         /**
@@ -549,6 +599,12 @@ namespace flexed {
         void class_method_stub(instance_ptr instance, Glib::ustring data) {
             return (static_cast<C*>(instance)->*handler)(data);
         }
+
+        /**
+         * Checks if all buffers saved. Prompts the user if not.
+         * @return false if not all saved. true if all saved.
+         */
+        bool check_buffers_saved();
     };
 }
 

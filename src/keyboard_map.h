@@ -40,7 +40,11 @@ typedef std::pair<instance_ptr, internal_function> stub;
  * We call again call_handler("CxCyCz").
  * call_handler() returns 0. That means the key binding matched a function.
  */
-class keyboard_map {
+
+namespace flexed {
+
+    class keyboard_map {
+
 public:
 
   /**
@@ -138,5 +142,6 @@ void insert_key_binding(const std::string& key_binding, stub* val_p) {
 
 };
 
+}
 
 #endif /* KEYBOARD_MAP_H_ */

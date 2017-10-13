@@ -3,6 +3,8 @@
 
 #include "keyboard_map.h"
 
+namespace flexed {
+
 void keyboard_map::remove_key_binding(const std::string& key_binding) {
   auto kb_split = split_key_bindings(key_binding);
   k_map_state1.erase(kb_split[0]);
@@ -90,3 +92,5 @@ void keyboard_map::insert_key_binding(const std::string& key_binding, stub* val_
   if (kb_state3.size() >= 1) {
     k_map_state3.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1] + kb_split[2], key_val_p));
 }*/
+
+}

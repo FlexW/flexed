@@ -15,8 +15,11 @@ extern "C" {
 #define FLEXED_MODE_PATH "/home/felix/Develop/flexed/build_debug/src/module/"
 
 namespace flexed {
-    typedef void func_type();
 
+    class editor;
+
+    typedef void key_binding_func_t();
+    typedef void start_func_t(editor*);
 /**
  * Loads a flexed mode (shared library) into memory
  * and calls functions of this mode.
@@ -27,7 +30,7 @@ namespace flexed {
  */
 class mode_loader {
 public:
-    mode_loader();
+    mode_loader(editor* ed);
 
     virtual ~mode_loader();
 
@@ -55,6 +58,8 @@ public:
     void call_function(std::list<std::string>& mode_list, std::string& name);
 
 private:
+
+    editor *ed;
 
     /** Mode search path. */
     std::string mode_search_path;
@@ -85,7 +90,7 @@ private:
      * If it's not in this form, the loader will be unable to find it.
      * @param mode_name Name of the mode.
      */
-    void call_mode_start_function(std::string &mode_name);
+    void call_mode_start_function(void *handle, std::string &mode_name);
 
     bool call_mode_buffer_start_function(std::string& mode_name);
 

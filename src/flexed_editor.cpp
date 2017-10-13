@@ -7,6 +7,11 @@
 
 #include "flexed_editor.h"
 #include "flexed_paned.h"
+#include "flexed_status_bar_view.h"
+#include "flexed_cmd_bar_view.h"
+#include "flexed_paned.h"
+#include "flexed_text_view.h"
+#include "keyboard_map.h"
 
 namespace flexed {
 
@@ -15,39 +20,39 @@ namespace flexed {
     }
 
     editor::~editor() {
-        delete status_bar;
+        //delete status_bar;
     }
-
+/*
     editor* editor::get_instance() {
         static editor instance;
         return &instance;
     }
-
+*/
     sigc::signal<void>& editor::signal_buffer_changed() {
         return sig_buffer_changed;
     }
 
-    sigc::signal<Gsv::View&>& editor::signal_text_view_created() {
+    sigc::signal<text_view&>& editor::signal_text_view_created() {
         return sig_text_view_created;
     }
 
-    sigc::signal<Gsv::View&>& editor::signal_text_view_removed() {
+    sigc::signal<text_view&>& editor::signal_text_view_removed() {
         return sig_text_view_removed;
     }
-
+/*
     Glib::RefPtr<text_buffer> editor::get_status_bar_buffer() {
         auto buffer = status_bar->get_buffer();
         auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
         return tbuffer;
     }
-
+*/
     Glib::RefPtr<text_buffer> editor::get_active_text_view_buffer() {
         auto buffer = active_text_view->get_buffer();
         auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
         return tbuffer;
     }
 
-    mode_loader& editor::get_mode_loader() {
+    std::shared_ptr<mode_loader> editor::get_mode_loader() {
         return fmode_loader;
     }
 
@@ -55,26 +60,24 @@ namespace flexed {
         return &main_box;
     }
 
-    Gsv::View* editor::get_cmd_bar() {
-        return &cmd_bar;
+    std::shared_ptr<cmd_bar_view> editor::get_cmd_bar() {
+        return cmd_bar;
     }
 
-    status_bar_view* editor::get_status_bar() {
+    std::shared_ptr<status_bar_view> editor::get_status_bar() {
         return status_bar;
     }
-
+/*
     Glib::RefPtr<text_buffer> editor::get_cmd_bar_buffer() {
-        auto buffer = cmd_bar.get_buffer();
-        auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
-        return tbuffer;
+        return cmd_bar->get_buffer();
     }
-
+*/
     std::shared_ptr<keyboard_map> editor::get_keyboard_map() {
         return g_keyboard_map;
     }
 
-    std::list<Gsv::View*> editor::get_text_views() {
-        std::list<Gsv::View*> list;
+    std::list<text_view*> editor::get_text_views() {
+        std::list<text_view*> list;
         for (auto p : text_view_map) {
             list.push_back(p.first);
         }
@@ -86,8 +89,12 @@ namespace flexed {
         return g_text_buffer_container;
     }
 
-    Gsv::View* editor::get_active_text_view() {
+    text_view* editor::get_active_text_view() {
         return active_text_view;
+    }
+
+    keyboard_handler& editor::get_keyboard_handler() {
+        return keyboard;
     }
 
     void editor::set_divider_from_active_paned(int pos) {
@@ -105,19 +112,22 @@ namespace flexed {
         }
         g_print("No Paned. Can not place divider\n");
     }
-
+/*
     void editor::set_cmd_bar_msg(const Glib::ustring& msg) {
         cmd_bar.get_buffer()->set_text(msg);
     }
-
+*/
     void
     editor::set_ask_for_save_file_buffer(Glib::RefPtr<text_buffer> buffer) {
         ask_for_save_file_buffer = buffer;
     }
 
+    void editor::set_text_view_focus(text_view* text_view) {
+    }
+
     void editor::open_file_prompt() {
-        get_cmd_bar_input<editor, &editor::open_file>("Open file",
-                                                      this);
+        cmd_bar->prompt_cmd_bar<editor, &editor::open_file>("Open file",
+                                                            this);
     }
 
     void editor::open_file(Glib::ustring fname) {
@@ -165,22 +175,22 @@ namespace flexed {
     }
 
         void editor::load_mode_prompt() {
-        get_cmd_bar_input<editor, &editor::load_mode>("Load mode",
-                                                               this);
+        cmd_bar->prompt_cmd_bar<editor, &editor::load_mode>("Load mode",
+                                                            this);
     }
 
     void editor::load_mode(Glib::ustring name) {
         g_print("try to load mode now\n");
-        if (fmode_loader.load_mode(
+        if (fmode_loader->load_mode(
                 (std::string&)get_active_text_view_buffer()->get_name(),
                 (std::string&)name)) {
             get_active_text_view_buffer()->add_mode((std::string&)name);
-            set_cmd_bar_msg(name + " loaded");
+            cmd_bar->set_cmd_bar_msg(name + " loaded");
         }
     }
 
     void editor::call_mode_function_prompt() {
-        get_cmd_bar_input<editor, &editor::call_mode_function>(
+        cmd_bar->prompt_cmd_bar<editor, &editor::call_mode_function>(
             "Execute", this);
     }
 
@@ -190,24 +200,25 @@ namespace flexed {
         for(auto mode : mode_list) {
             g_print("mode in mode_list: %s\n", mode.c_str());
         }
-        fmode_loader.call_function(mode_list, (std::string&)name);
+        fmode_loader->call_function(mode_list, (std::string&)name);
     }
 
     void editor::unload_mode_prompt() {
-        get_cmd_bar_input<editor, &editor::unload_mode>("Unload mode", this);
+        cmd_bar->prompt_cmd_bar<editor, &editor::unload_mode>(
+            "Unload mode", this);
     }
 
     void editor::unload_mode(Glib::ustring name) {
         g_print("unload mode now\n");
         get_active_text_view_buffer()->unset_mode((std::string&)name);
-        fmode_loader.unload_mode(
+        fmode_loader->unload_mode(
             (std::string&)get_active_text_view_buffer()->get_name(),
             (std::string&)name);
-        set_cmd_bar_msg(name + " unloaded");
+        cmd_bar->set_cmd_bar_msg(name + " unloaded");
     }
 
     void editor::ask_for_save_prompt() {
-        get_cmd_bar_input<editor, &editor::ask_for_save>(
+        cmd_bar->prompt_cmd_bar<editor, &editor::ask_for_save>(
             ask_for_save_file_buffer->get_name()
             + " | File modified. Save? [y/n]", this);
     }
@@ -267,13 +278,13 @@ namespace flexed {
         if (tfile.is_open()) {
             tfile << buffer->get_text();
             tfile.close();
-            set_cmd_bar_msg("Save successfully");
+        cmd_bar->set_cmd_bar_msg("Save successfully");
             g_print("file saved.\n");
             get_active_text_view_buffer()->set_modified(false);
             status_bar->set_file_stats();
             return;
         }
-        set_cmd_bar_msg("Save failed!");
+        cmd_bar->set_cmd_bar_msg("Save failed!");
         g_print("file not saved\n");
     }
 
@@ -285,11 +296,11 @@ namespace flexed {
         }
         close();
     }
-
+/*
     void editor::clear_cmd_bar() {
         cmd_bar.get_buffer()->set_text("");
-    }
-
+        }*/
+/*
     void editor::abort_cmd() {
         if (cmd_bar_callback_stub != nullptr) {
             free(cmd_bar_callback_stub);
@@ -298,13 +309,13 @@ namespace flexed {
         clear_cmd_bar();
         set_focus(*active_text_view);
     }
-
+*//*
     void editor::focus_cmd_bar() {
         keyboard.set_keyboard_map(cmd_bar_keyboard_map);
         cmd_bar.get_buffer()->set_text("");
         set_focus(cmd_bar);
     }
-
+  */
     void editor::insert_paned_horizontal() {
         insert_paned(Gtk::ORIENTATION_HORIZONTAL);
     }
@@ -314,10 +325,10 @@ namespace flexed {
     }
 
     void editor::insert_paned(Gtk::Orientation orientation) {
-        Gsv::View* active_tv = (Gsv::View*)get_focus();
+        text_view* active_tv = (text_view*)get_focus();
         if (active_tv == nullptr
-            || active_tv == &cmd_bar
-            || active_tv == status_bar) {
+            || active_tv == (text_view*)cmd_bar.get()
+            || active_tv == (text_view*)status_bar.get()) {
             return;
         }
         Gtk::ScrolledWindow* active =
@@ -331,14 +342,14 @@ namespace flexed {
 
     void editor::insert_first_paned(Gtk::ScrolledWindow *active,
                                     Gtk::Orientation orientation) {
-        main_box.remove(cmd_bar);
+        main_box.remove(*cmd_bar);
         main_box.remove(*status_bar);
         main_box.remove(*active);
 
         paned* n_paned = create_paned(active, orientation);
         main_box.pack_start(*n_paned);
         main_box.pack_start(*status_bar, Gtk::PACK_SHRINK);
-        main_box.pack_start(cmd_bar, Gtk::PACK_SHRINK);
+        main_box.pack_start(*cmd_bar, Gtk::PACK_SHRINK);
         show_all_children();
 
         active = (Gtk::ScrolledWindow*)n_paned->get_child2();
@@ -369,23 +380,17 @@ namespace flexed {
         set_divider_from_active_paned(50);
     }
 
-    Gtk::ScrolledWindow* editor::create_text_view(Gsv::View* old_tv) {
-        Gsv::View* tv = new Gsv::View();
-        tv->set_show_line_numbers();
-        Gtk::ScrolledWindow* w = new Gtk::ScrolledWindow();
-        w->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-        w->add(*tv);
-        add_text_view_to_map(tv, *text_view_map.find(old_tv)->second);
+    Gtk::ScrolledWindow* editor::create_editing_text_view(text_view* old_tv) {
+        auto w = construct_editing_text_view();
+        add_text_view_to_map((text_view*)w->get_child(),
+                             *text_view_map.find(old_tv)->second);
         return w;
     }
 
-    Gtk::ScrolledWindow* editor::create_text_view() {
-        Gsv::View* tv = new Gsv::View();
-        tv->set_show_line_numbers();
-        Gtk::ScrolledWindow* w = new Gtk::ScrolledWindow();
-        w->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-        w->add(*tv);
-        add_text_view_to_map(tv, *g_text_buffer_container);
+    Gtk::ScrolledWindow* editor::create_editing_text_view() {
+        auto w = construct_editing_text_view();
+        add_text_view_to_map((text_view*)w->get_child(),
+                             *g_text_buffer_container);
         return w;
     }
 
@@ -393,7 +398,7 @@ namespace flexed {
                                 Gtk::Orientation orientation) {
         paned* p = new paned(orientation);
         p->add1(*left_side);
-        p->add2(*create_text_view((Gsv::View*)left_side->get_child()));
+        p->add2(*create_editing_text_view((text_view*)left_side->get_child()));
         g_print("Created paned\n");
         return p;
     }
@@ -401,8 +406,8 @@ namespace flexed {
     void editor::remove_paned() {
         auto active_tv = get_focus();
         if (active_tv == nullptr
-            || active_tv == &cmd_bar
-            || active_tv == status_bar) {
+            || active_tv == (text_view*)cmd_bar.get()
+            || active_tv == (text_view*)status_bar.get()) {
             return;
         }
 
@@ -415,19 +420,19 @@ namespace flexed {
         if ((Gtk::Box*)active_paned->get_parent() == &main_box) {
             remove_last_paned(active_paned,
                               (Gtk::ScrolledWindow*)active_sw,
-                              (Gsv::View*)active_tv);
+                              (text_view*)active_tv);
             reset_active_text_view(active_tv);
             return;
         }
         remove_other_paned(active_paned,
                            (Gtk::ScrolledWindow*)active_sw,
-                           (Gsv::View*)active_tv);
+                           (text_view*)active_tv);
         reset_active_text_view(active_tv);
     }
 
     void editor::remove_last_paned(paned* active_paned,
                                    Gtk::ScrolledWindow* active_sw,
-                                   Gsv::View* active_tv) {
+                                   text_view* active_tv) {
         active_paned->remove(*active_sw);
         remove_text_view_from_map(active_tv);
         delete active_tv;
@@ -438,14 +443,14 @@ namespace flexed {
             replace_sw = active_paned->get_child2();
 
         active_paned->remove(*replace_sw);
-        main_box.remove(cmd_bar);
+        main_box.remove(*cmd_bar);
         main_box.remove(*status_bar);
         main_box.remove(*active_paned);
         delete active_paned;
 
         main_box.pack_start(*replace_sw);
         main_box.pack_start(*status_bar, Gtk::PACK_SHRINK);
-        main_box.pack_start(cmd_bar, Gtk::PACK_SHRINK);
+        main_box.pack_start(*cmd_bar, Gtk::PACK_SHRINK);
 
         text_view_count--;
 
@@ -461,7 +466,7 @@ namespace flexed {
 
     void editor::remove_other_paned(paned* active_paned,
                                     Gtk::ScrolledWindow* active_sw,
-                                    Gsv::View* active_tv) {
+                                    text_view* active_tv) {
         active_paned->remove(*active_sw);
         remove_text_view_from_map(active_tv);
         delete active_tv;
@@ -502,7 +507,7 @@ namespace flexed {
             return;
         }
         g_print("previous buffer\n");
-        auto bcontainer =text_view_map.find(active_text_view)->second;
+        auto bcontainer = text_view_map.find(active_text_view)->second;
         bcontainer->previous();
         signal_buffer_changed().emit();
     }
@@ -635,23 +640,55 @@ namespace flexed {
     }
 
     void editor::init_editor() {
-        main_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL, 2);
+        g_print("try init editor\n");
+        fmode_loader = std::make_shared<mode_loader>(this);
+        g_text_buffer_container
+                       = std::make_shared<global_text_buffer_container>();
+        g_keyboard_map = std::make_shared<keyboard_map>();
+//cmd_bar_buffer = Glib::RefPtr<text_buffer>(new text_buffer(this));
+        status_bar     = std::make_shared<status_bar_view>(this);
+        cmd_bar        = std::make_shared<cmd_bar_view>(this);
+
+        setup_main_window();
+        setup_welcome_text_buffer();
+        setup_main_box();
+        setup_signals();
+        show_all_children();
+        g_print("init editor finished\n");
+    }
+
+    void editor::setup_main_window() {
         set_title("flexed");
         set_default_size(900, 300);
+        g_print("setup main window finished\n");
+    }
 
+    void editor::setup_main_box() {
+        main_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL, 2);
         add(main_box);
 
-        g_text_buffer_container
-            = std::make_shared<global_text_buffer_container>();
-        cmd_bar_buffer = Glib::RefPtr<text_buffer>(new text_buffer(this));
-        g_keyboard_map = std::make_shared<keyboard_map>();
-        cmd_bar_keyboard_map = std::make_shared<keyboard_map>();
-        status_bar = new status_bar_view();
+        main_box.pack_start(*create_editing_text_view());
+        main_box.pack_start(*status_bar, Gtk::PACK_SHRINK);
+        main_box.pack_start(*cmd_bar, Gtk::PACK_SHRINK);
+        g_print("setup main box finished\n");
+    }
 
-        cmd_bar_buffer->set_keyboard_map(cmd_bar_keyboard_map);
+    void editor::setup_signals() {
+        add_events(Gdk::KEY_PRESS_MASK);
+        add_events(Gdk::KEY_RELEASE_MASK);
+        add_events(Gdk::STRUCTURE_MASK);
+        add_events(Gdk::EventMask::FOCUS_CHANGE_MASK);
 
+        signal_key_press_event()
+            .connect(sigc::mem_fun(*this, &editor::on_key_pressed), false);
+        signal_buffer_changed()
+            .connect(sigc::mem_fun(*this, &editor::on_buffer_changed));
+        g_print("setup signals finished\n");
+    }
+
+    void editor::setup_welcome_text_buffer() {
         std::string first_buffer_name("*HOME*");
-        first_buffer = Glib::RefPtr<text_buffer>(new text_buffer(this));
+        first_buffer = Glib::RefPtr<text_buffer>(new text_buffer());
         //first_buffer = create_text_buffer(first_buffer_name);
         first_buffer->set_text("Welcome to the flexed text editor.");
         first_buffer->set_modified(false);
@@ -662,33 +699,10 @@ namespace flexed {
             sigc::mem_fun(*status_bar, &status_bar_view::set_file_stats));
         g_text_buffer_container->add(first_buffer);
 
-        main_box.pack_start(*create_text_view());
-        main_box.pack_start(*status_bar, Gtk::PACK_SHRINK);
-        main_box.pack_start(cmd_bar, Gtk::PACK_SHRINK);
-        //status_bar.set_editable(false);
-
-        no_editable_tag = Gsv::Buffer::Tag::create();
-        no_editable_tag->property_editable() = false;
-        cmd_bar.get_buffer()->get_tag_table()->add(no_editable_tag);
-
-        add_events(Gdk::KEY_PRESS_MASK);
-        add_events(Gdk::KEY_RELEASE_MASK);
-        add_events(Gdk::STRUCTURE_MASK);
-
-        show_all_children();
-
-        cmd_bar_keyboard_map
-            ->set_key_binding<editor, &editor::abort_cmd>("Cg", this);
-        cmd_bar_keyboard_map
-            ->set_key_binding<editor, &editor::execute_cmd>("N", this);
-
-        signal_key_press_event()
-            .connect(sigc::mem_fun(*this, &editor::on_key_pressed), false);
-        signal_buffer_changed()
-            .connect(sigc::mem_fun(*this, &editor::on_buffer_changed));
+        g_print("setup welcome buffer finished\n");
     }
 
-    void editor::remove_text_view_from_map(Gsv::View* view) {
+    void editor::remove_text_view_from_map(text_view* view) {
         auto iter = text_view_map.find(view);
         if (iter == text_view_map.end()) {
             return;
@@ -696,13 +710,13 @@ namespace flexed {
         text_view_map.erase(iter);
     }
 
-    void editor::add_text_view_to_map(Gsv::View* view,
+    void editor::add_text_view_to_map(text_view* view,
                                       orderd_container<
                                       Glib::RefPtr <text_buffer> >&
                                       old_container) {
         text_buffer_container* c
             = new text_buffer_container(g_text_buffer_container, view);
-        text_view_map.insert(std::pair<Gsv::View*,
+        text_view_map.insert(std::pair<text_view*,
                              text_buffer_container*>(view, c));
         c->take_over_text_buffer_container_list(old_container);
 
@@ -716,13 +730,20 @@ namespace flexed {
             g_print("editor instance this: %p\n", this);
             std::string init_mode_name = "init";
             std::string init_buffer_name = "*INIT*";
-            fmode_loader.load_mode(init_buffer_name, init_mode_name);
+            fmode_loader->load_mode(init_buffer_name, init_mode_name);
             start = false;
-            //fmode_loader.unload_mode(init_buffer_name, init_mode_name);
+            g_print("init mode loading finished\n");
+            //fmode_loader->unload_mode(init_buffer_name, init_mode_name);
         }
-        active_text_view = static_cast<Gsv::View*>(get_focus());
-        auto buffer = active_text_view->get_buffer();
-        auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
+        active_text_view = (text_view*)get_focus();
+        g_print("active_text_view addr: %p\n", active_text_view);
+        if (active_text_view == nullptr) {
+            g_print("returning: active_text_view == nullptr\n");
+            return false;
+        }
+        g_print("here\n");
+        Glib::RefPtr<text_buffer> tbuffer = active_text_view->get_text_buffer();
+        //auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
         keyboard.set_keyboard_map(tbuffer->get_keyboard_map());
         signal_buffer_changed().emit();
         g_print("TextView focus changed\n");
@@ -745,7 +766,7 @@ namespace flexed {
 
     Glib::RefPtr<text_buffer> editor::create_text_buffer(
         std::string& buffer_name) {
-        auto new_buffer = Glib::RefPtr<text_buffer>(new text_buffer(this));
+        auto new_buffer = Glib::RefPtr<text_buffer>(new text_buffer());
         new_buffer->set_name(buffer_name);
         g_text_buffer_container->add(
             static_cast< Glib::RefPtr<text_buffer> >(new_buffer));
@@ -764,12 +785,12 @@ namespace flexed {
         }
     }
 
-    Gsv::View* editor::find_text_view_in_paned_child1(paned* ppaned) {
+    text_view* editor::find_text_view_in_paned_child1(paned* ppaned) {
         switch (get_paned_orientation(ppaned)) {
         case Gtk::ORIENTATION_VERTICAL:
             if (is_scrolled_window(ppaned->get_child1())) {
                 auto sw = (Gtk::ScrolledWindow*)ppaned->get_child1();
-                return (Gsv::View*)sw->get_child();
+                return (text_view*)sw->get_child();
             }
             return find_text_view_in_paned_child1((paned*)ppaned->get_child1());
             break;
@@ -777,19 +798,19 @@ namespace flexed {
         case Gtk::ORIENTATION_HORIZONTAL:
             if (is_scrolled_window(ppaned->get_child1())) {
                 auto sw = (Gtk::ScrolledWindow*)ppaned->get_child1();
-                return (Gsv::View*)sw->get_child();
+                return (text_view*)sw->get_child();
             }
             return find_text_view_in_paned_child1((paned*)ppaned->get_child1());
             break;
         }
     }
 
-    Gsv::View* editor::find_text_view_in_paned_child2(paned* ppaned) {
+    text_view* editor::find_text_view_in_paned_child2(paned* ppaned) {
         switch (get_paned_orientation(ppaned)) {
         case Gtk::ORIENTATION_VERTICAL:
             if (is_scrolled_window(ppaned->get_child2())) {
                 auto sw = (Gtk::ScrolledWindow*)ppaned->get_child2();
-                return (Gsv::View*)sw->get_child();
+                return (text_view*)sw->get_child();
             }
             return find_text_view_in_paned_child2((paned*)ppaned->get_child2());
             break;
@@ -797,7 +818,7 @@ namespace flexed {
         case Gtk::ORIENTATION_HORIZONTAL:
             if (is_scrolled_window(ppaned->get_child2())) {
                 auto sw = (Gtk::ScrolledWindow*)ppaned->get_child2();
-                return (Gsv::View*)sw->get_child();
+                return (text_view*)sw->get_child();
             }
             return find_text_view_in_paned_child2((paned*)ppaned->get_child2());
             break;
@@ -816,7 +837,7 @@ namespace flexed {
         return true;
     }
 
-    bool editor::is_paned_child1(Gsv::View* text_view) {
+    bool editor::is_paned_child1(text_view* text_view) {
         auto sw = dynamic_cast<Gtk::ScrolledWindow*>(text_view->get_parent());
         auto ppaned = dynamic_cast<paned*>(sw->get_parent());
         if (ppaned->get_child1() == sw) {
@@ -836,7 +857,7 @@ namespace flexed {
         return false;
     }
 
-    bool editor::is_paned_child2(Gsv::View* text_view) {
+    bool editor::is_paned_child2(text_view* text_view) {
         auto sw = dynamic_cast<Gtk::ScrolledWindow*>(text_view->get_parent());
         auto ppaned = dynamic_cast<paned*>(sw->get_parent());
         if (ppaned->get_child2() == sw) {
@@ -856,7 +877,7 @@ namespace flexed {
         return false;
     }
 
-    paned* editor::get_paned(Gsv::View* text_view) {
+    paned* editor::get_paned(text_view* text_view) {
         auto sw = dynamic_cast<Gtk::ScrolledWindow*>(text_view->get_parent());
         auto ppaned = dynamic_cast<paned*>(sw->get_parent());
         return ppaned;
@@ -869,22 +890,22 @@ namespace flexed {
         }
         return parent_paned;
     }
-
+/*
     void editor::execute_cmd() {
         if (cmd_bar_callback_stub != nullptr) {
             g_print("callback execute cmd bar\n");
             auto text = cmd_bar.get_buffer()->get_text(true);
             auto pos = text.find(CMD_BAR_PROMPT_SEPERATOR);
             auto text_sub = text.substr(pos + CMD_BAR_PROMPT_SEPERATOR_LEN);
-            cmd_bar_callback_stub->second(cmd_bar_callback_stub->first,
-                                          text_sub);
+            //cmd_bar_callback_stub->second(cmd_bar_callback_stub->first,
+            //                              text_sub);
             free(cmd_bar_callback_stub);
         }
         clear_cmd_bar();
         set_focus(*active_text_view);
         cmd_bar_callback_stub = nullptr;
     }
-
+*/
     void editor::on_buffer_changed() {
         g_print("signal buffer changed\n");
         //status_bar->set_filename(
@@ -915,5 +936,13 @@ namespace flexed {
             }
         }
         return true;
+    }
+
+    Gtk::ScrolledWindow* editor::construct_editing_text_view() {
+        auto tv = new text_view();
+        auto w = new Gtk::ScrolledWindow();
+        w->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+        w->add(*tv);
+        return w;
     }
 }

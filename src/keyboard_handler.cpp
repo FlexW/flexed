@@ -2,6 +2,8 @@
 
 #include "keyboard_handler.h"
 
+namespace flexed {
+
 bool keyboard_handler::on_key_pressed(GdkEventKey* event_key) {
   //static int skip_times = 0;
 
@@ -105,4 +107,6 @@ void keyboard_handler::set_keyboard_map(std::shared_ptr<keyboard_map> k_map) {
 void keyboard_handler::reset_states() {
   last_ret_code = 0;
   g_mask = "";
+}
+
 }

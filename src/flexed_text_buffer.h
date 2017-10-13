@@ -11,14 +11,15 @@
 #include <gtksourceviewmm.h>
 
 #include "flexed_editor.h"
-#include "keyboard_map.h"
-#include "flexed_mode.h"
-
-extern "C" {
+//#include "flexed_editor.h"
+//#include "keyboard_map.h"
+//#include "flexed_mode.h"
 
 namespace flexed {
 
-class editor;
+//class editor;
+    class editor;
+    class keyboard_map;
 
 /**
  * Represents a text buffer in a text view.
@@ -26,7 +27,7 @@ class editor;
 class text_buffer : public Gsv::Buffer {
 
 public:
-  text_buffer(editor* ed);
+  text_buffer();
   virtual ~text_buffer();
 
   /**
@@ -46,7 +47,7 @@ public:
    * Sets the keyboard map of the buffer.
    * @param kmap Keyboard map.
    */
-  void set_keyboard_map(std::shared_ptr<keyboard_map> kmap);
+  void set_keyboard_map(std::shared_ptr<keyboard_map> k_map);
 
   /**
    * Gets the keyboard map of the buffer.
@@ -73,7 +74,6 @@ public:
   void unset_mode(std::string& m);
 
 private:
-  editor* ed = nullptr;
   Glib::ustring name;
 
   std::shared_ptr<keyboard_map> kmap;
@@ -84,6 +84,4 @@ private:
 
 }
 
-}
-
-#endif /* FLEXED_TEXT_BUFFER_H_ */
+#endif // FLEXED_TEXT_BUFFER_H_

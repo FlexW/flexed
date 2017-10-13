@@ -5,7 +5,7 @@ namespace flexed {
 
 extern "C" {
     void init_end();
-    void init_start();
+    void init_start(editor *ed);
     void init_buffer_start();
     void init_buffer_end();
 }

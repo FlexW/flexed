@@ -11,6 +11,7 @@
 
 #include "keyboard_map.h"
 
+namespace flexed {
 /**
  * Handels keyboard input.
  */
@@ -34,5 +35,7 @@ private:
 
   void reset_states();
 };
+
+}
 
 #endif

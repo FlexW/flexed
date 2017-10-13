@@ -4,11 +4,14 @@
 #include <cstring>
 
 #include "flexed_text_buffer.h"
+#include "flexed_editor.h"
+#include "keyboard_map.h"
+#include "flexed_mode.h"
 
 namespace flexed {
 
-text_buffer::text_buffer(editor *ed) : Gsv::Buffer() {
-  this->ed = ed;
+text_buffer::text_buffer() {
+    kmap = std::make_shared<keyboard_map>();
 }
 
 text_buffer::~text_buffer() {
@@ -22,8 +25,8 @@ Glib::ustring& text_buffer::get_name() {
   return name;
 }
 
-void text_buffer::set_keyboard_map(std::shared_ptr<keyboard_map> kmap) {
-  this->kmap = kmap;
+void text_buffer::set_keyboard_map(std::shared_ptr<keyboard_map> k_map) {
+    kmap = k_map;
 }
 
 std::shared_ptr<keyboard_map> text_buffer::get_keyboard_map() {

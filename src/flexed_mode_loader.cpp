@@ -10,7 +10,8 @@
 
 namespace flexed {
 
-    mode_loader::mode_loader() {
+    mode_loader::mode_loader(editor* ed) {
+        this->ed = ed;
         mode_search_path = FLEXED_MODE_PATH;
     }
 
@@ -57,7 +58,7 @@ namespace flexed {
             g_print("mode handle: %p\n", mode_handle);
             g_print("saved mode as: %s\n", mode_name.c_str());
             g_print("mode loaded\n");
-            call_mode_start_function(mode_name);
+            call_mode_start_function(mode_handle, mode_name);
         }
         call_mode_buffer_start_function(mode_name);
         return true;
@@ -86,11 +87,13 @@ void mode_loader::call_function(std::list<std::string>& mode_list,
                                 std::string& name) {
     g_print("mode_loader::call_function\n");
     for (auto mode : mode_list) {
-        g_print("try to find function %s in mode: %s\n", name.c_str(), mode.c_str());
+        g_print("try to find function %s in mode: %s\n", name.c_str(),
+                mode.c_str());
         auto iter = mode_handle_map.find(mode);
         if (iter != mode_handle_map.end()) {
             g_print("mode handle: %p\n", iter->second);
-            func_type* ffunction = (func_type*)dlsym(iter->second, name.c_str());
+            key_binding_func_t* ffunction
+                = (key_binding_func_t*)dlsym(iter->second, name.c_str());
             if (!ffunction) {
                 g_print("mode_loader::call_function func not found\n");
                 continue;
@@ -103,15 +106,24 @@ void mode_loader::call_function(std::list<std::string>& mode_list,
     g_print("function not found\n");
 }
 
-void mode_loader::call_mode_start_function(std::string& mode_name) {
+    void mode_loader::call_mode_start_function(void *handle,
+                                               std::string& mode_name) {
     std::string fname = "_start";
     std::string real_mode_name = mode_name;
     real_mode_name = replace_minus_with_underscore(real_mode_name);
     fname = real_mode_name + fname;
 
     std::list<std::string> l = {mode_name};
-    g_print("call start func: %s in mode: %s\n", fname.c_str(), mode_name.c_str());
-    call_function(l, fname);
+    g_print("call start func: %s in mode: %s\n", fname.c_str(),
+            mode_name.c_str());
+    //call_function(l, fname);
+    start_func_t* ffunction
+        = (start_func_t*)dlsym(handle, fname.c_str());
+    if (!ffunction) {
+        g_print("mode_loader::call_function func not found\n");
+        return;
+    }
+    ffunction(ed);
 }
 
 bool mode_loader::call_mode_buffer_start_function(std::string& mode_name) {

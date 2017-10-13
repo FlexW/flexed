@@ -49,7 +49,7 @@ namespace flexed {
 
         template<class C, void (C::*callback)(Glib::ustring)>
         void prompt_cmd_bar_y_or_n(const Glib::ustring& prompt,
-                                                 C* instance) {
+                                   C* instance) {
         }
 
         /**

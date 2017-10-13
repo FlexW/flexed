@@ -920,6 +920,9 @@ namespace flexed {
 
     bool editor::on_key_pressed(GdkEventKey* key_event) {
         //status_bar->set_file_stats();
+        if (active_text_view == get_focus()) {
+            cmd_bar->clear_cmd_bar();
+        }
         return keyboard.on_key_pressed(key_event);
     }
 

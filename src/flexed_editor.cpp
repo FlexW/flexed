@@ -20,14 +20,8 @@ namespace flexed {
     }
 
     editor::~editor() {
-        //delete status_bar;
     }
-/*
-    editor* editor::get_instance() {
-        static editor instance;
-        return &instance;
-    }
-*/
+
     sigc::signal<void>& editor::signal_buffer_changed() {
         return sig_buffer_changed;
     }
@@ -39,13 +33,7 @@ namespace flexed {
     sigc::signal<text_view&>& editor::signal_text_view_removed() {
         return sig_text_view_removed;
     }
-/*
-    Glib::RefPtr<text_buffer> editor::get_status_bar_buffer() {
-        auto buffer = status_bar->get_buffer();
-        auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
-        return tbuffer;
-    }
-*/
+
     Glib::RefPtr<text_buffer> editor::get_active_text_view_buffer() {
         auto buffer = active_text_view->get_buffer();
         auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
@@ -67,11 +55,7 @@ namespace flexed {
     std::shared_ptr<status_bar_view> editor::get_status_bar() {
         return status_bar;
     }
-/*
-    Glib::RefPtr<text_buffer> editor::get_cmd_bar_buffer() {
-        return cmd_bar->get_buffer();
-    }
-*/
+
     std::shared_ptr<keyboard_map> editor::get_keyboard_map() {
         return g_keyboard_map;
     }
@@ -112,11 +96,7 @@ namespace flexed {
         }
         g_print("No Paned. Can not place divider\n");
     }
-/*
-    void editor::set_cmd_bar_msg(const Glib::ustring& msg) {
-        cmd_bar.get_buffer()->set_text(msg);
-    }
-*/
+
     void
     editor::set_ask_for_save_file_buffer(Glib::RefPtr<text_buffer> buffer) {
         ask_for_save_file_buffer = buffer;
@@ -296,26 +276,7 @@ namespace flexed {
         }
         close();
     }
-/*
-    void editor::clear_cmd_bar() {
-        cmd_bar.get_buffer()->set_text("");
-        }*/
-/*
-    void editor::abort_cmd() {
-        if (cmd_bar_callback_stub != nullptr) {
-            free(cmd_bar_callback_stub);
-            cmd_bar_callback_stub = nullptr;
-        }
-        clear_cmd_bar();
-        set_focus(*active_text_view);
-    }
-*//*
-    void editor::focus_cmd_bar() {
-        keyboard.set_keyboard_map(cmd_bar_keyboard_map);
-        cmd_bar.get_buffer()->set_text("");
-        set_focus(cmd_bar);
-    }
-  */
+
     void editor::insert_paned_horizontal() {
         insert_paned(Gtk::ORIENTATION_HORIZONTAL);
     }
@@ -645,7 +606,6 @@ namespace flexed {
         g_text_buffer_container
                        = std::make_shared<global_text_buffer_container>();
         g_keyboard_map = std::make_shared<keyboard_map>();
-//cmd_bar_buffer = Glib::RefPtr<text_buffer>(new text_buffer(this));
         status_bar     = std::make_shared<status_bar_view>(this);
         cmd_bar        = std::make_shared<cmd_bar_view>(this);
 
@@ -890,28 +850,9 @@ namespace flexed {
         }
         return parent_paned;
     }
-/*
-    void editor::execute_cmd() {
-        if (cmd_bar_callback_stub != nullptr) {
-            g_print("callback execute cmd bar\n");
-            auto text = cmd_bar.get_buffer()->get_text(true);
-            auto pos = text.find(CMD_BAR_PROMPT_SEPERATOR);
-            auto text_sub = text.substr(pos + CMD_BAR_PROMPT_SEPERATOR_LEN);
-            //cmd_bar_callback_stub->second(cmd_bar_callback_stub->first,
-            //                              text_sub);
-            free(cmd_bar_callback_stub);
-        }
-        clear_cmd_bar();
-        set_focus(*active_text_view);
-        cmd_bar_callback_stub = nullptr;
-    }
-*/
+
     void editor::on_buffer_changed() {
         g_print("signal buffer changed\n");
-        //status_bar->set_filename(
-        //    (std::string&)get_active_text_view_buffer()->get_name());
-        //get_status_bar_buffer()
-        //    ->set_text("    " + get_active_text_view_buffer()->get_name());
         keyboard.set_keyboard_map(
             get_active_text_view_buffer()->get_keyboard_map());
         status_bar->set_file_stats();
@@ -919,7 +860,6 @@ namespace flexed {
     }
 
     bool editor::on_key_pressed(GdkEventKey* key_event) {
-        //status_bar->set_file_stats();
         if (active_text_view == get_focus()) {
             cmd_bar->clear_cmd_bar();
         }

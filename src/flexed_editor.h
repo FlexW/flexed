@@ -13,19 +13,12 @@
 #include <gtkmm.h>
 #include <gtksourceviewmm.h>
 
-//#include "flexed_text_view.h"
 #include "flexed_text_buffer.h"
-//#include "flexed_paned.h"
 #include "flexed_mode_loader.h"
 #include "keyboard_handler.h"
 #include "orderd_container.h"
 #include "flexed_global_text_buffer_container.h"
 #include "flexed_text_buffer_container.h"
-//#include "flexed_status_bar_view.h"
-//#include "flexed_cmd_bar_view.h"
-
-//#define CMD_BAR_PROMPT_SEPERATOR_LEN 4
-//#define CMD_BAR_PROMPT_SEPERATOR " >> "
 
 namespace flexed {
 
@@ -42,15 +35,9 @@ namespace flexed {
 
     public:
 
-        //static editor* get_instance();
-
         editor();
 
         virtual ~editor();
-
-        //editor(editor const&) = delete;
-
-        //void operator = (editor const&) = delete;
 
         /**
          * Gets the signal buffer changed. This signal will be emitted,
@@ -77,36 +64,10 @@ namespace flexed {
         sigc::signal<text_view&>& signal_text_view_removed();
 
         /**
-         * Gets the buffer of the status bar.
-         * @returns Buffer.
-         */
-        //Glib::RefPtr<text_buffer> get_status_bar_buffer();
-
-        /**
          * Gets the buffer of the active text view.
          * @returns Buffer.
          */
         Glib::RefPtr<text_buffer> get_active_text_view_buffer();
-
-        /**
-         * Gets input from the command bar.
-         * A callback must be specified which gets called if the user
-         * pressed RETURN.
-         * To this callback the user input gets routed.
-         * @param prompt A String that gets prompted to the user in the
-         * command bar.
-         */
-        /* template<class C, void (C::*callback)(Glib::ustring)>
-        void get_cmd_bar_input(const Glib::ustring& prompt, C* instance) {
-            /* focus_cmd_bar();
-            auto s = new stub(instance, &class_method_stub<C, callback>);
-            cmd_bar.get_buffer()->insert_with_tag(
-                cmd_bar.get_buffer()->begin(),
-                prompt + CMD_BAR_PROMPT_SEPERATOR,
-                no_editable_tag);
-            cmd_bar_callback_stub = s;
-            g_print("get_cmd_bar_input returned\n");
-        }*/
 
         /**
          * Returns the editors mode loader.
@@ -132,12 +93,6 @@ namespace flexed {
          * @returns Status bar.
          */
         std::shared_ptr<status_bar_view> get_status_bar();
-
-        /**
-         * Gets the command bars buffer.
-         * @returns Command bar buffer.
-         */
-        //Glib::RefPtr<text_buffer> get_cmd_bar_buffer();
 
         /**
          * Returns the editors keyboard map.
@@ -174,11 +129,6 @@ namespace flexed {
          * @param pos Divider position. Must be between 0 and 100.
          */
         void set_divider_from_active_paned(int pos);
-
-        /**
-         * Sets a message in the command bar.
-         */
-        //void set_cmd_bar_msg(const Glib::ustring& msg);
 
         /**
          * Sets the ask_for_save_file_buffer, that gets checked by
@@ -283,16 +233,6 @@ namespace flexed {
          * Exits the editor.
          */
         void quit();
-
-        /**
-         * Clears the command bar.
-         */
-        //void clear_cmd_bar();
-
-        /**
-         * Aborts current command. Clears command bar.
-         */
-        //void abort_cmd();
 
         /**
          * Focuses the command bar.
@@ -423,11 +363,8 @@ namespace flexed {
          */
         void switch_paned_right();
 
-    private:/*
-        typedef void *instance_ptr;
-        typedef void (*internal_function)(instance_ptr, Glib::ustring);
-        typedef std::pair<instance_ptr, internal_function>  stub;
-            */
+    private:
+
         /** Indicates if the editor is starting. */
         bool start = true;
 
@@ -439,25 +376,18 @@ namespace flexed {
 
         sigc::signal<text_view&> sig_text_view_removed;
 
-        //std::shared_ptr<stub> cmd_bar_callback_stub;
-        //std::function<void(Glib::ustring)> cmd_bar_callback = nullptr;
         keyboard_handler keyboard;
 
         /** Global keyboard map. */
         std::shared_ptr<keyboard_map> g_keyboard_map;
 
-        /** Command bar keyboard map. */
-        //std::shared_ptr<keyboard_map> cmd_bar_keyboard_map;
-
         Gtk::Box  main_box;
+
         std::shared_ptr<cmd_bar_view> cmd_bar;
-        //text_view status_bar;
+
         std::shared_ptr<status_bar_view> status_bar;
 
-        //Glib::RefPtr<Gsv::Buffer::Tag> no_editable_tag;
-
         Glib::RefPtr<text_buffer> first_buffer;
-        //Glib::RefPtr<text_buffer>   cmd_bar_buffer;
 
         /** Counts current opend text views. */
         int text_view_count = 1;
@@ -628,18 +558,6 @@ namespace flexed {
          * If it has no parent parent paned, nullptr.
          */
         paned* get_parent_paned(paned* ppaned);
-
-        /**
-         * Executes a command in the command bar.
-         */
-        //void execute_cmd();
-
-        /** Turns a member function into internal function stub. */
-        /*template <class C, void (C::*handler)(Glib::ustring)>
-        static __attribute__((always_inline))
-        void class_method_stub(instance_ptr instance, Glib::ustring data) {
-            return (static_cast<C*>(instance)->*handler)(data);
-            }*/
 
         /**
          * Checks if all buffers saved. Prompts the user if not.

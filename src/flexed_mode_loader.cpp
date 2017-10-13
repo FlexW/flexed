@@ -116,7 +116,6 @@ void mode_loader::call_function(std::list<std::string>& mode_list,
     std::list<std::string> l = {mode_name};
     g_print("call start func: %s in mode: %s\n", fname.c_str(),
             mode_name.c_str());
-    //call_function(l, fname);
     start_func_t* ffunction
         = (start_func_t*)dlsym(handle, fname.c_str());
     if (!ffunction) {

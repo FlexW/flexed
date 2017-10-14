@@ -2,6 +2,7 @@
 #include <gtkmm.h>
 
 #include "keyboard_map.h"
+#include "log.h"
 
 namespace flexed {
 
@@ -33,9 +34,9 @@ int keyboard_map::call_handler(const std::string& key_binding) {
     if (func == nullptr) {
       return 2;
     }
-    g_print("func p: %p\n", func);
-    g_print("func->second p: %p\n", func->second);
-    g_print("func->first p: %p\n", func->first);
+    FILE_LOG(LOG_DEBUG2) << "Func p: " << func;
+    FILE_LOG(LOG_DEBUG2) << "Func->second p: " << func->second;
+    FILE_LOG(LOG_DEBUG2) << "Func->first p: " << func->first;
     func->second(func->first);
     return 0;
   }
@@ -50,7 +51,8 @@ int keyboard_map::call_handler(const std::string& key_binding) {
   return 0;
 }
 
-std::vector<std::string> keyboard_map::split_key_bindings(const std::string& key_binding) {
+std::vector<std::string> keyboard_map::split_key_bindings(
+    const std::string& key_binding) {
   int kb_size = key_binding.size();
   std::string kb_state1 = "";
   std::string kb_state2 = "";
@@ -70,27 +72,5 @@ std::vector<std::string> keyboard_map::split_key_bindings(const std::string& key
   std::vector<std::string> vec = {kb_state1, kb_state2, kb_state3};
   return vec;
 }
-/*
-void keyboard_map::insert_key_binding(const std::string& key_binding, stub* val_p) {
-  auto kb_split = split_key_bindings(key_binding);
-  if (kb_split[0].size() >= 1) {
-    if (kb_split[1].size() >= 1) {
-      k_map_state1.insert(std::pair<std::string, stub*>(kb_split[0], nullptr));
-    }
-    else {
-      k_map_state1.insert(std::pair<std::string, stub*>(kb_split[0], key_val_p));
-    }
-  }
-  if (kb_split[1].size() >= 1) {
-    if (kb_split[2].size() >= 1) {
-      k_map_state2.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1], nullptr));
-    }
-    else {
-      k_map_state2.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1], key_val_p));
-    }
-  }
-  if (kb_state3.size() >= 1) {
-    k_map_state3.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1] + kb_split[2], key_val_p));
-}*/
 
 }

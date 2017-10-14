@@ -6,11 +6,13 @@
 
 namespace flexed {
 
-void global_text_buffer_container::register_text_buffer_added(text_buffer_container* h) {
+void global_text_buffer_container::register_text_buffer_added(
+    text_buffer_container* h) {
   handler_list.push_back(h);
 }
 
-void global_text_buffer_container::remove_text_buffer_handler(text_buffer_container* h) {
+void global_text_buffer_container::remove_text_buffer_handler(
+    text_buffer_container* h) {
   auto pos = 0;
   auto found = false;
 
@@ -32,17 +34,20 @@ void global_text_buffer_container::on_added(Glib::RefPtr<text_buffer> obj) {
   text_buffer_added(obj);
 }
 
-void global_text_buffer_container::before_removed(Glib::RefPtr<text_buffer> obj) {
+void global_text_buffer_container::before_removed(
+    Glib::RefPtr<text_buffer> obj) {
   text_buffer_removed(obj);
 }
 
-void global_text_buffer_container::text_buffer_added(Glib::RefPtr<text_buffer> buffer) {
+void global_text_buffer_container::text_buffer_added(
+    Glib::RefPtr<text_buffer> buffer) {
   for (auto handler : handler_list) {
     handler->on_text_buffer_added(buffer);
   }
 }
 
-void global_text_buffer_container::text_buffer_removed(Glib::RefPtr<text_buffer> buffer) {
+void global_text_buffer_container::text_buffer_removed(
+    Glib::RefPtr<text_buffer> buffer) {
   for (auto handler : handler_list) {
     handler->on_text_buffer_removed(buffer);
   }

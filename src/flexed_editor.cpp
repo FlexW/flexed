@@ -12,6 +12,7 @@
 #include "flexed_paned.h"
 #include "flexed_text_view.h"
 #include "keyboard_map.h"
+#include "log.h"
 
 namespace flexed {
 
@@ -94,7 +95,7 @@ namespace flexed {
             ppaned->set_divider_pos_relative(pos);
             return;
         }
-        g_print("No Paned. Can not place divider\n");
+        FILE_LOG(LOG_INFO) << "No Paned. Can not place divider";
     }
 
     void
@@ -112,20 +113,20 @@ namespace flexed {
 
     void editor::open_file(Glib::ustring fname) {
         if (!fname.compare("")) {
-            g_print("No file name\n");
+            FILE_LOG(LOG_INFO) << "No file name";
             return;
         }
-        g_print("Open file: %s\n", fname.c_str());
+        FILE_LOG(LOG_INFO) << "Open file: " << fname;
         auto fname_path = boost::filesystem::path(fname);
         auto abs_path = boost::filesystem::absolute(fname_path);
         auto abs_path_str = abs_path.string();
         if (is_buffer_open(abs_path_str)) {
-            g_print("Buffer already open\n");
+            FILE_LOG(LOG_INFO) << "Buffer already open";
             return;
         }
         auto file = new std::ifstream(fname);
         if (!file) {
-            g_print("Error opening file\n");
+            FILE_LOG(LOG_INFO) << "Error opening file";
             delete file;
             return;
         }
@@ -160,7 +161,7 @@ namespace flexed {
     }
 
     void editor::load_mode(Glib::ustring name) {
-        g_print("try to load mode now\n");
+        FILE_LOG(LOG_INFO) << "Try to load mode now";
         if (fmode_loader->load_mode(
                 (std::string&)get_active_text_view_buffer()->get_name(),
                 (std::string&)name)) {
@@ -175,7 +176,7 @@ namespace flexed {
     }
 
     void editor::call_mode_function(Glib::ustring name) {
-        g_print("call function now\n");
+        FILE_LOG(LOG_INFO) << "Try to call function now";
         auto mode_list = get_active_text_view_buffer()->get_mode_list();
         for(auto mode : mode_list) {
             g_print("mode in mode_list: %s\n", mode.c_str());
@@ -189,7 +190,7 @@ namespace flexed {
     }
 
     void editor::unload_mode(Glib::ustring name) {
-        g_print("unload mode now\n");
+        FILE_LOG(LOG_INFO) << "Try to unload mode now";
         get_active_text_view_buffer()->unset_mode((std::string&)name);
         fmode_loader->unload_mode(
             (std::string&)get_active_text_view_buffer()->get_name(),
@@ -218,13 +219,13 @@ namespace flexed {
             ask_for_save_file_buffer->set_modified(false);
         }
         else if (y_or_n_flag == -1) {
-            g_print("not y or no \n");
+            FILE_LOG(LOG_INFO) << "Not y or no";
             ask_for_save_prompt();
             return;
         }
-        g_print("exit_editor_flag: %d\n", exit_editor_flag);
+        FILE_LOG(LOG_DEBUG1) << "exit_editor_flag: " << exit_editor_flag;
         if (exit_editor_flag) {
-            g_print("call quit again\n");
+            FILE_LOG(LOG_DEBUG1) << "call quit again";
             quit();
         }
     }
@@ -253,23 +254,23 @@ namespace flexed {
 
     void editor::save_file(Glib::RefPtr<text_buffer> buffer) {
         auto fname = buffer->get_name();
-        g_print("save file as: %s\n", fname.c_str());
+        FILE_LOG(LOG_INFO) << "Save file as: %s" << fname;
         std::ofstream tfile(fname);
         if (tfile.is_open()) {
             tfile << buffer->get_text();
             tfile.close();
         cmd_bar->set_cmd_bar_msg("Save successfully");
-            g_print("file saved.\n");
+        FILE_LOG(LOG_INFO) << "File saved";
             get_active_text_view_buffer()->set_modified(false);
             status_bar->set_file_stats();
             return;
         }
         cmd_bar->set_cmd_bar_msg("Save failed!");
-        g_print("file not saved\n");
+        FILE_LOG(LOG_INFO) << "File not saved";
     }
 
     void editor::quit() {
-        g_print("quit\n");
+        FILE_LOG(LOG_INFO) << "Exit editor now";
         exit_editor_flag = true;
         if (!check_buffers_saved()) {
             return;
@@ -360,7 +361,7 @@ namespace flexed {
         paned* p = new paned(orientation);
         p->add1(*left_side);
         p->add2(*create_editing_text_view((text_view*)left_side->get_child()));
-        g_print("Created paned\n");
+        FILE_LOG(LOG_DEBUG1) << "Created paned";
         return p;
     }
 
@@ -416,11 +417,11 @@ namespace flexed {
         text_view_count--;
 
         if (auto sw = dynamic_cast<Gtk::ScrolledWindow*>(replace_sw)) {
-            g_print("set focus scrolled win\n");
+            FILE_LOG(LOG_DEBUG2) << "Set focus scrolled win";
             set_focus(*sw->get_child());
         }
         else  if (auto p = dynamic_cast<paned*>(replace_sw)) {
-            g_print("set focus paned\n");
+            FILE_LOG(LOG_DEBUG2) << "Set focus paned";
             set_focus(*(paned*)p->get_child1());
         }
     }
@@ -453,11 +454,11 @@ namespace flexed {
         text_view_count--;
 
         if (auto sw = dynamic_cast<Gtk::ScrolledWindow*>(replace_sw)) {
-            g_print("set focus scrolled win\n");
+            FILE_LOG(LOG_DEBUG2) << "Set focus scrolled win";
             set_focus(*sw->get_child());
         }
         else  if (auto p = dynamic_cast<paned*>(replace_sw)) {
-            g_print("set focus paned\n");
+            FILE_LOG(LOG_DEBUG2) << "Set focus paned";
             auto c = (Gtk::ScrolledWindow*)p->get_child1();
             set_focus(*c->get_child());
         }
@@ -467,7 +468,7 @@ namespace flexed {
         if (active_text_view == nullptr) {
             return;
         }
-        g_print("previous buffer\n");
+        FILE_LOG(LOG_INFO) << "Switch previous buffer";
         auto bcontainer = text_view_map.find(active_text_view)->second;
         bcontainer->previous();
         signal_buffer_changed().emit();
@@ -477,7 +478,7 @@ namespace flexed {
         if (active_text_view == nullptr) {
             return;
         }
-        g_print("next buffer\n");
+        FILE_LOG(LOG_INFO) << "Switch next buffer";
         auto bcontainer = text_view_map.find(active_text_view)->second;
         bcontainer->next();
         signal_buffer_changed().emit();
@@ -486,7 +487,7 @@ namespace flexed {
     void editor::switch_paned_up() {
         auto ppaned = get_paned(active_text_view);
         if (ppaned == nullptr) {
-            g_print("paned == nullptr\n");
+            FILE_LOG(LOG_DEBUG2) << "paned == nullptr";
             return;
         }
         if (get_paned_orientation(ppaned) == Gtk::ORIENTATION_VERTICAL
@@ -496,11 +497,12 @@ namespace flexed {
         }
         auto parent_paned = ppaned;
         do {
-            g_print("search paned\n");
+            FILE_LOG(LOG_DEBUG2) << "search paned";
             ppaned = parent_paned;
             parent_paned = get_parent_paned(ppaned);
             if (parent_paned == nullptr) {
-                g_print("no upper text view\n");
+                FILE_LOG(LOG_DEBUG2) << "No upper text view";
+                cmd_bar->set_cmd_bar_msg("No upper text view");
                 return;
             }
         } while (((get_paned_orientation(parent_paned)
@@ -515,7 +517,7 @@ namespace flexed {
     void editor::switch_paned_down() {
         auto ppaned = get_paned(active_text_view);
         if (ppaned == nullptr) {
-            g_print("paned == nullptr\n");
+            FILE_LOG(LOG_DEBUG2) << "paned == nullptr";
             return;
         }
         if (get_paned_orientation(ppaned) == Gtk::ORIENTATION_VERTICAL
@@ -525,11 +527,12 @@ namespace flexed {
         }
         auto parent_paned = ppaned;
         do {
-            g_print("search paned\n");
+            FILE_LOG(LOG_DEBUG2) << "Search paned";
             ppaned = parent_paned;
             parent_paned = get_parent_paned(ppaned);
             if (parent_paned == nullptr) {
-                g_print("no lower text view\n");
+                FILE_LOG(LOG_DEBUG2) << "No lower text view";
+                cmd_bar->set_cmd_bar_msg("No lower text view");
                 return;
             }
         } while (((get_paned_orientation(parent_paned)
@@ -544,7 +547,7 @@ namespace flexed {
     void editor::switch_paned_left() {
         auto ppaned = get_paned(active_text_view);
         if (ppaned == nullptr) {
-            g_print("paned == nullptr\n");
+            FILE_LOG(LOG_DEBUG2) << "paned == nullptr\n";
             return;
         }
         if (get_paned_orientation(ppaned) == Gtk::ORIENTATION_HORIZONTAL
@@ -554,11 +557,12 @@ namespace flexed {
         }
         auto parent_paned = ppaned;
         do {
-            g_print("search paned\n");
+            FILE_LOG(LOG_DEBUG2) << "Search paned\n";
             ppaned = parent_paned;
             parent_paned = get_parent_paned(ppaned);
             if (parent_paned == nullptr) {
-                g_print("no left text view\n");
+                FILE_LOG(LOG_DEBUG2) << "No left text view";
+                cmd_bar->set_cmd_bar_msg("No left text view");
                 return;
             }
         } while (((get_paned_orientation(parent_paned)
@@ -573,22 +577,23 @@ namespace flexed {
     void editor::switch_paned_right() {
         auto ppaned = get_paned(active_text_view);
         if (ppaned == nullptr) {
-            g_print("paned == nullptr\n");
+            FILE_LOG(LOG_DEBUG2) << "paned == nullptr";
             return;
         }
         if (get_paned_orientation(ppaned) == Gtk::ORIENTATION_HORIZONTAL
             && is_paned_child1(active_text_view)) {
-            g_print("set focus\n");
+            FILE_LOG(LOG_DEBUG2) << "Set focus";
             set_focus(*find_text_view_in_paned_child2(ppaned));
             return;
         }
         auto parent_paned = ppaned;
         do {
-            g_print("search paned\n");
+            FILE_LOG(LOG_DEBUG2) << "Search paned";
             ppaned = parent_paned;
             parent_paned = get_parent_paned(ppaned);
             if (parent_paned == nullptr) {
-                g_print("no right text view\n");
+                FILE_LOG(LOG_DEBUG2) << "No right text view";
+                cmd_bar->set_cmd_bar_msg("No right text view");
                 return;
             }
         } while (((get_paned_orientation(parent_paned)
@@ -601,7 +606,6 @@ namespace flexed {
     }
 
     void editor::init_editor() {
-        g_print("try init editor\n");
         fmode_loader = std::make_shared<mode_loader>(this);
         g_text_buffer_container
                        = std::make_shared<global_text_buffer_container>();
@@ -614,13 +618,11 @@ namespace flexed {
         setup_main_box();
         setup_signals();
         show_all_children();
-        g_print("init editor finished\n");
     }
 
     void editor::setup_main_window() {
         set_title("flexed");
         set_default_size(900, 300);
-        g_print("setup main window finished\n");
     }
 
     void editor::setup_main_box() {
@@ -630,7 +632,6 @@ namespace flexed {
         main_box.pack_start(*create_editing_text_view());
         main_box.pack_start(*status_bar, Gtk::PACK_SHRINK);
         main_box.pack_start(*cmd_bar, Gtk::PACK_SHRINK);
-        g_print("setup main box finished\n");
     }
 
     void editor::setup_signals() {
@@ -643,7 +644,6 @@ namespace flexed {
             .connect(sigc::mem_fun(*this, &editor::on_key_pressed), false);
         signal_buffer_changed()
             .connect(sigc::mem_fun(*this, &editor::on_buffer_changed));
-        g_print("setup signals finished\n");
     }
 
     void editor::setup_welcome_text_buffer() {
@@ -658,8 +658,6 @@ namespace flexed {
         cur_pos_prop.signal_changed().connect(
             sigc::mem_fun(*status_bar, &status_bar_view::set_file_stats));
         g_text_buffer_container->add(first_buffer);
-
-        g_print("setup welcome buffer finished\n");
     }
 
     void editor::remove_text_view_from_map(text_view* view) {
@@ -692,28 +690,23 @@ namespace flexed {
             std::string init_buffer_name = "*INIT*";
             fmode_loader->load_mode(init_buffer_name, init_mode_name);
             start = false;
-            g_print("init mode loading finished\n");
-            //fmode_loader->unload_mode(init_buffer_name, init_mode_name);
+            FILE_LOG(LOG_INFO) << "init mode loading finished";
         }
         active_text_view = (text_view*)get_focus();
-        g_print("active_text_view addr: %p\n", active_text_view);
         if (active_text_view == nullptr) {
-            g_print("returning: active_text_view == nullptr\n");
             return false;
         }
-        g_print("here\n");
         Glib::RefPtr<text_buffer> tbuffer = active_text_view->get_text_buffer();
-        //auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
         keyboard.set_keyboard_map(tbuffer->get_keyboard_map());
         signal_buffer_changed().emit();
-        g_print("TextView focus changed\n");
+        FILE_LOG(LOG_INFO) << "Text view focus changed";
         return false;
     }
 
     bool editor::is_buffer_open(std::string& buffer_name) {
         auto func = [&buffer_name](Glib::RefPtr<text_buffer> buf)->bool {
             if (!buffer_name.compare(buf->get_name())) {
-                g_print("buffer name matched\n");
+                FILE_LOG(LOG_INFO) << "Buffer name matched";
                 return false;
             }
             return true;
@@ -740,7 +733,7 @@ namespace flexed {
 
     void editor::reset_active_text_view(Gtk::Widget* tv) {
         if (tv == active_text_view) {
-            g_print("reset active_text_view.\n");
+            FILE_LOG(LOG_DEBUG1) << "Reset active_text_view";
             active_text_view = nullptr;
         }
     }
@@ -852,7 +845,7 @@ namespace flexed {
     }
 
     void editor::on_buffer_changed() {
-        g_print("signal buffer changed\n");
+        FILE_LOG(LOG_INFO) << "Signal buffer changed";
         keyboard.set_keyboard_map(
             get_active_text_view_buffer()->get_keyboard_map());
         status_bar->set_file_stats();
@@ -869,10 +862,10 @@ namespace flexed {
     bool editor::check_buffers_saved() {
         auto buffer_vec = g_text_buffer_container->get_obj_vec();
         for (auto buffer : buffer_vec) {
-            g_print("buffer: %s modified: %d\n", buffer->get_name().c_str(),
-                    buffer->get_modified());
+            FILE_LOG(LOG_DEBUG1) << "Buffer: " << buffer->get_name()
+                                 << " modified: " << buffer->get_modified();
             if (buffer->get_modified()) {
-                g_print("ask now for save\n");
+                FILE_LOG(LOG_DEBUG1) << "Ask now for save";
                 ask_for_save_file_buffer = buffer;
                 ask_for_save_prompt();
                 return false;

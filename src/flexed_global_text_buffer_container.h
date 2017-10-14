@@ -23,7 +23,8 @@ class text_buffer_container;
  * Stores all open text buffers.
  * Notifies registerd containers if a new buffer was added.
  */
-class global_text_buffer_container :  public orderd_container< Glib::RefPtr<text_buffer> > {
+class global_text_buffer_container :
+    public orderd_container< Glib::RefPtr<text_buffer> > {
 
 public:
   global_text_buffer_container() {}

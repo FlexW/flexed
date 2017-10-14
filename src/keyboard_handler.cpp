@@ -1,58 +1,50 @@
 #include <cstring>
 
 #include "keyboard_handler.h"
+#include "log.h"
 
 namespace flexed {
 
 bool keyboard_handler::on_key_pressed(GdkEventKey* event_key) {
-  //static int skip_times = 0;
-
-  /*
-  if (skip_times > 0) {
-    skip_times--;
-    return false;
-  }
-  */
   std::string mask = "";
-  //int cnt_key_pressed = 0;
+
   if (event_key->state & GDK_MOD1_MASK) {
-    g_print("ALT LEFT pressed\n");
+      FILE_LOG(LOG_DEBUG2) << "ALT LEFT pressed";
     mask += "A";
-    //cnt_key_pressed++;
   }
   if (event_key->state & GDK_SHIFT_MASK) {
-    g_print("SHIFT pressed\n");
+      FILE_LOG(LOG_DEBUG2) << "SHIFT pressed";
     mask += "S";
     //cnt_key_pressed++;
   }
   if (event_key->state & GDK_CONTROL_MASK) {
-    g_print("CTRL pressed\n");
+      FILE_LOG(LOG_DEBUG2) << "CTRL pressed";
     mask += "C";
     //cnt_key_pressed++;
   }
   if (std::isprint(event_key->keyval)) {
-    g_print("ASCII pressed\n");
+      FILE_LOG(LOG_DEBUG2) << "ASCII pressed";
     mask += event_key->keyval;
     //cnt_key_pressed++;
   }
   if (event_key->keyval == GDK_KEY_Up) {
-    g_print("Up pressed\n");
+      FILE_LOG(LOG_DEBUG2) << "Up pressed\n";
     mask += "U";
   }
   if (event_key->keyval == GDK_KEY_Down) {
-    g_print("Down pressed\n");
+      FILE_LOG(LOG_DEBUG2) << "Down pressed";
     mask += "D";
   }
   if (event_key->keyval == GDK_KEY_Left) {
-    g_print("Left pressed\n");
-    mask += "L";
+      FILE_LOG(LOG_DEBUG2) << "Left pressed";
+      mask += "L";
   }
   if (event_key->keyval == GDK_KEY_Right) {
-    g_print("Right pressed\n");
+      FILE_LOG(LOG_DEBUG2) << "Right pressed";
     mask += "R";
   }
   if (event_key->keyval == GDK_KEY_Return) {
-      g_print("Return pressed\n");
+      FILE_LOG(LOG_DEBUG2) << "Return pressed";
       mask += "N";
   }
 
@@ -61,7 +53,7 @@ bool keyboard_handler::on_key_pressed(GdkEventKey* event_key) {
     return false;
 
   if (last_ret_code == 0) {
-    g_print("call key handler: %s\n", mask.c_str());
+      FILE_LOG(LOG_INFO) << "Call key handler: " << mask;
     int ret_code = k_map->call_handler(mask);
     if (ret_code == 1) {
       last_ret_code = 1;
@@ -76,7 +68,7 @@ bool keyboard_handler::on_key_pressed(GdkEventKey* event_key) {
   }
   else if (last_ret_code == 1) {
     g_mask += mask;
-    g_print("call key handler: %s\n", g_mask.c_str());
+    FILE_LOG(LOG_INFO) << "Call key handler: " << g_mask;
     int ret_code = k_map->call_handler(g_mask);
     if (ret_code == 2) {
       last_ret_code = 2;
@@ -90,7 +82,7 @@ bool keyboard_handler::on_key_pressed(GdkEventKey* event_key) {
   }
   else if (last_ret_code == 2) {
     g_mask += mask;
-    g_print("call key handler: %s\n", g_mask.c_str());
+    FILE_LOG(LOG_INFO) << "Call key handler: " << g_mask;
     int ret_code = k_map->call_handler(g_mask);
     reset_states();
     if (ret_code == 0) {

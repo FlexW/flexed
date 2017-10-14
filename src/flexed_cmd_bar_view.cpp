@@ -4,6 +4,7 @@
 
 #include "flexed_cmd_bar_view.h"
 #include "keyboard_map.h"
+#include "log.h"
 
 namespace flexed {
 
@@ -27,7 +28,7 @@ namespace flexed {
         clear_cmd_bar();
         ed->set_focus(*(ed->get_active_text_view()));
         if (prompt_callback != nullptr) {
-            g_print("callback execute cmd bar\n");
+            FILE_LOG(LOG_DEBUG1) << "Callback execute cmd bar";
             auto callback = *prompt_callback;
             ed->set_focus(*(ed->get_active_text_view()));
             reset_prompt_callback();

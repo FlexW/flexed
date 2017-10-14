@@ -30,18 +30,6 @@ namespace flexed{
         filename_text_view.set_bottom_margin(2);
         filename_text_view.set_right_margin(7);
         filename_text_view.set_left_margin(30);
-/*
-        editor::get_instance()->signal_buffer_changed()
-            .connect(
-                sigc::mem_fun(*this, &status_bar_view::set_filename));
-
-        editor::get_instance()->signal_buffer_changed()
-            .connect(
-                sigc::mem_fun(*this, &status_bar_view::set_file_stats));
-
-        set_filename();
-        set_file_stats();
-*/
     }
 
     status_bar_view::~status_bar_view() {
@@ -60,7 +48,6 @@ namespace flexed{
         auto buffer = ed->get_active_text_view_buffer();
         auto cursor_mark = buffer->get_insert();
         auto iter = buffer->get_iter_at_mark(cursor_mark);
-        g_print("line in buffer %d\n", iter.get_line());
 
         int line_num = iter.get_line() + 1;
         int line_count = buffer->get_line_count();

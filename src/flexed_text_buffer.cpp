@@ -7,6 +7,7 @@
 #include "flexed_editor.h"
 #include "keyboard_map.h"
 #include "flexed_mode.h"
+#include "log.h"
 
 namespace flexed {
 
@@ -34,16 +35,11 @@ std::shared_ptr<keyboard_map> text_buffer::get_keyboard_map() {
 }
 
 void text_buffer::add_mode(std::string& m) {
-  g_print("add mode: %s\n", m.c_str());
+    FILE_LOG(LOG_INFO) << "Add mode: " << m;
   mode_list.push_back(m);
 }
 
 void text_buffer::unset_mode(std::string& m ) {
-    // NOTE: This does not really unload the mode.
-    // It just removes it from the mode list,
-    // so that when the user tries to enter a function,
-    // it will not be found anymore.
-    // The mode stays in memory. It gets not unloaded from memory.
     auto iter = std::find(mode_list.begin(), mode_list.end(), m);
     if (iter != mode_list.end()) {
         mode_list.erase(iter);

@@ -47,6 +47,10 @@ bool keyboard_handler::on_key_pressed(GdkEventKey* event_key) {
       FILE_LOG(LOG_DEBUG2) << "Return pressed";
       mask += "N";
   }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F1 pressed";
+      mask += "F11";
+  }
 
   //skip_times = cnt_key_pressed - 1;
   if (k_map == nullptr)

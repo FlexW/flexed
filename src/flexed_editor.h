@@ -157,6 +157,12 @@ namespace flexed {
         void set_text_view_focus(text_view* text_view);
 
         /**
+         * Sets the editor into fullscreen if it is not in fullscreen.
+         * Unset the fullscreen if window is in fullscreen.
+         */
+        void switch_fullscreen();
+
+        /**
          * Opens a text file.
          * Creates a buffer for the file,
          * takes care that not one file is opend twice.
@@ -429,6 +435,8 @@ namespace flexed {
         /** Inidicates if the editor wants to exit. */
         bool exit_editor_flag = false;
 
+        bool is_fullscreen = false;
+
         Glib::RefPtr<text_buffer> ask_for_save_file_buffer;
 
         /**
@@ -470,7 +478,15 @@ namespace flexed {
          */
         void on_buffer_changed();
 
+        /**
+         * Gets called if the user tries to close the window.
+         */
         bool on_delete_event(GdkEventAny* any_event);
+
+        /**
+         * Gets called if the windows state changes.
+         */
+        bool on_window_state_event(GdkEventWindowState* window_state_event);
 
         /**
          * Removes a text view entry from the text_view_map.

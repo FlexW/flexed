@@ -106,6 +106,17 @@ namespace flexed {
     void editor::set_text_view_focus(text_view* text_view) {
     }
 
+    void editor::switch_fullscreen() {
+        FILE_LOG(LOG_INFO) << "Request fullscreen now";
+        if (is_fullscreen) {
+            is_fullscreen = false;
+            unfullscreen();
+            return;
+        }
+        is_fullscreen = true;
+        fullscreen();
+    }
+
     void editor::open_file_prompt() {
         cmd_bar->prompt_cmd_bar<editor, &editor::open_file>("Open file",
                                                             this);
@@ -664,6 +675,9 @@ namespace flexed {
             .connect(sigc::mem_fun(*this, &editor::on_buffer_changed));
         signal_delete_event()
             .connect(sigc::mem_fun(*this, &editor::on_delete_event), false);
+        signal_window_state_event()
+            .connect(sigc::mem_fun(
+                         *this, &editor::on_window_state_event), false);
     }
 
     void editor::setup_welcome_text_buffer() {
@@ -886,6 +900,17 @@ namespace flexed {
             cmd_bar->clear_cmd_bar();
         }
         return keyboard.on_key_pressed(key_event);
+    }
+
+    bool
+    editor::on_window_state_event(GdkEventWindowState* window_state_event) {
+        FILE_LOG(LOG_INFO) << "Window state changed";
+        /*if (is_fullscreen) {
+            is_fullscreen = false;
+            return false;
+        }
+        is_fullscreen = true;*/
+        return false;
     }
 
     bool editor::check_buffers_saved() {

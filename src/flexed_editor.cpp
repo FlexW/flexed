@@ -662,6 +662,8 @@ namespace flexed {
             .connect(sigc::mem_fun(*this, &editor::on_key_pressed), false);
         signal_buffer_changed()
             .connect(sigc::mem_fun(*this, &editor::on_buffer_changed));
+        signal_delete_event()
+            .connect(sigc::mem_fun(*this, &editor::on_delete_event), false);
     }
 
     void editor::setup_welcome_text_buffer() {
@@ -868,6 +870,15 @@ namespace flexed {
             get_active_text_view_buffer()->get_keyboard_map());
         status_bar->set_file_stats();
         status_bar->set_filename();
+    }
+
+    bool editor::on_delete_event(GdkEventAny* any_event) {
+        FILE_LOG(LOG_DEBUG1) << "User pressed windows X to close";
+        if (exit_editor_flag) {
+            return false;
+        }
+        quit();
+        return true;
     }
 
     bool editor::on_key_pressed(GdkEventKey* key_event) {

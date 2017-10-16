@@ -470,6 +470,8 @@ namespace flexed {
          */
         void on_buffer_changed();
 
+        bool on_delete_event(GdkEventAny* any_event);
+
         /**
          * Removes a text view entry from the text_view_map.
          * Frees the buffer_container. TextView gets not freed.

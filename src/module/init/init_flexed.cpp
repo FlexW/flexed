@@ -32,16 +32,16 @@ void init_start(editor *ed) {
         "CxL", ed);
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_paned_up>(
-        "SU", ed);
+        "AU", ed);
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_paned_down>(
-        "SD", ed);
+        "AD", ed);
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_paned_left>(
-        "SL", ed);
+        "AL", ed);
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_paned_right>(
-        "SR", ed);
+        "AR", ed);
 
     g_keyboard_map->set_key_binding<editor, &editor::call_mode_function_prompt>(
         "Ax", ed);

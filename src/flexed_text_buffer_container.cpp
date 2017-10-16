@@ -3,6 +3,7 @@
  */
 
 #include "flexed_text_buffer_container.h"
+#include "log.h"
 
 namespace flexed {
 
@@ -23,6 +24,7 @@ void text_buffer_container::on_text_buffer_added(
 
 void text_buffer_container::on_text_buffer_removed(
     Glib::RefPtr<text_buffer> buffer) {
+  FILE_LOG(LOG_INFO) << "Buffer removing";
   int pos = 0;
   int size = obj_vec.size();
   for(; pos < size; pos++) {
@@ -31,6 +33,7 @@ void text_buffer_container::on_text_buffer_removed(
       break;
     }
   }
+  set_buffer();
 }
 
 void text_buffer_container::take_over_text_buffer_container_list(

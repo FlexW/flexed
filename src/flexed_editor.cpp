@@ -605,6 +605,20 @@ namespace flexed {
         set_focus(*find_text_view_in_paned_child2(parent_paned));
     }
 
+    void editor::remove_active_text_buffer() {
+        auto buffer = active_text_view->get_text_buffer();
+        if (buffer->get_modified() == false) {
+            remove_buffer(buffer);
+            return;
+        }
+        set_ask_for_save_file_buffer(buffer);
+        ask_for_save_prompt();
+    }
+
+    void editor::remove_buffer(Glib::RefPtr<text_buffer> buffer) {
+        g_text_buffer_container->remove(buffer);
+    }
+
     void editor::init_editor() {
         fmode_loader = std::make_shared<mode_loader>(this);
         g_text_buffer_container

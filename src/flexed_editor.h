@@ -363,6 +363,17 @@ namespace flexed {
          */
         void switch_paned_right();
 
+       /**
+        * Removes the active text buffer from the editor.
+        */
+        void remove_active_text_buffer();
+
+        /**
+         * Removes the given buffer from the editor.
+         * @param buffer Buffer to remove.
+         */
+        void remove_buffer(Glib::RefPtr<text_buffer> buffer);
+
     private:
 
         /** Indicates if the editor is starting. */

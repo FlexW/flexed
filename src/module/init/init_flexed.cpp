@@ -56,6 +56,9 @@ void init_start(editor *ed) {
 
     g_keyboard_map->set_key_binding<editor, &editor::unload_mode_prompt>(
         "CmCu", ed);
+
+    g_keyboard_map->set_key_binding<editor, &editor::remove_active_text_buffer>(
+        "CxCk", ed);
 }
 
 void init_buffer_end() {

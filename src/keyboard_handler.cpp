@@ -49,6 +49,46 @@ bool keyboard_handler::on_key_pressed(GdkEventKey* event_key) {
   }
   if (event_key->keyval == GDK_KEY_F11) {
       FILE_LOG(LOG_DEBUG2) << "F1 pressed";
+      mask += "F1";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F2 pressed";
+      mask += "F2";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F3 pressed";
+      mask += "F3";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F4 pressed";
+      mask += "F4";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F5 pressed";
+      mask += "F5";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F6 pressed";
+      mask += "F6";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F7 pressed";
+      mask += "F7";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F8 pressed";
+      mask += "F8";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F9 pressed";
+      mask += "F9";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F10 pressed";
+      mask += "F10";
+  }
+  if (event_key->keyval == GDK_KEY_F11) {
+      FILE_LOG(LOG_DEBUG2) << "F11 pressed";
       mask += "F11";
   }
 

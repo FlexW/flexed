@@ -138,6 +138,16 @@ namespace flexed {
         void set_ask_for_save_file_buffer(Glib::RefPtr<text_buffer> buffer);
 
         /**
+         * Sets a callback to a function that gets invoked after
+         * ask_for_save_file() gets a result.
+         */
+        template<class C, void (C::*callback)(Glib::ustring)>
+        void set_ask_for_save_file_callback(C* instance) {
+            ask_for_save_file_callback = std::make_shared<stub>(
+                instance, &class_method_stub(instance, callback));
+        }
+
+        /**
          * Sets the focus on a text view widget in the editor correct.
          * That means setting up the keyboard map correctly.
          * Use this function when ever you want to change
@@ -376,6 +386,10 @@ namespace flexed {
 
     private:
 
+        typedef void *instance_ptr;
+        typedef void (*internal_function)(instance_ptr, Glib::ustring);
+        typedef std::pair<instance_ptr, internal_function>  stub;
+
         /** Indicates if the editor is starting. */
         bool start = true;
 
@@ -416,6 +430,12 @@ namespace flexed {
         bool exit_editor_flag = false;
 
         Glib::RefPtr<text_buffer> ask_for_save_file_buffer;
+
+        /**
+         * Saves a callback to a function that gets called after the
+         * function ask_for_save_file() got a result.
+         */
+        std::shared_ptr<stub> ask_for_save_file_callback;
 
         /**
          * This is the editors entry point.
@@ -581,6 +601,15 @@ namespace flexed {
          * @returns Scrolled window with text view.
          */
         Gtk::ScrolledWindow* construct_editing_text_view();
+
+        /**
+         * Turns a member function into internal function stub.
+         */
+        template <class C, void (C::*handler)(Glib::ustring)>
+        static __attribute__((always_inline))
+        void class_method_stub(instance_ptr instance, Glib::ustring data) {
+            return (static_cast<C*>(instance)->*handler)(data);
+        }
     };
 }
 

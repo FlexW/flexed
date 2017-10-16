@@ -5,6 +5,7 @@
 #ifndef FLEXED_CMD_BAR_VIEW_H_
 #define FLEXED_CMD_BAR_VIEW_H_
 
+#include <vector>
 #include <gtkmm.h>
 #include <gtksourceviewmm.h>
 #include <gdkmm.h>

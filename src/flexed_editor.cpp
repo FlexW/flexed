@@ -609,6 +609,10 @@ namespace flexed {
         auto buffer = active_text_view->get_text_buffer();
         if (buffer->get_modified() == false) {
             remove_buffer(buffer);
+            if (g_text_buffer_container->size() == 0) {
+                FILE_LOG(LOG_INFO) << "Quit editor since all buffers removed\n";
+                quit();
+            }
             return;
         }
         set_ask_for_save_file_buffer(buffer);

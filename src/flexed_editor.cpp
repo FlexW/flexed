@@ -610,7 +610,7 @@ namespace flexed {
         if (buffer->get_modified() == false) {
             remove_buffer(buffer);
             if (g_text_buffer_container->size() == 0) {
-                FILE_LOG(LOG_INFO) << "Quit editor since all buffers removed\n";
+                FILE_LOG(LOG_INFO) << "Quit editor since all buffers removed";
                 quit();
             }
             return;

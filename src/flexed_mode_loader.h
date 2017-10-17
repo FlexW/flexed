@@ -11,9 +11,6 @@
 
 extern "C" {
 
-// The path after which the loader searches for modules.
-#define FLEXED_MODE_PATH "/home/felix/Develop/flexed/build_debug/src/module/"
-
 namespace flexed {
 
     class editor;
@@ -69,6 +66,11 @@ private:
 
     /** Stores the name of modes that are open in buffers. */
     std::multimap<std::string, std::string> mode_buffer_map;
+
+    /**
+     * The directory in which should be searched after modules.
+     */
+    std::string mode_load_path;
 
     /**
      * Converts a mode name to the real shared library name.

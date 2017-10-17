@@ -2,6 +2,7 @@
  * @file flexed_mode_loader.cpp
  */
 
+#include <cstdlib>
 #include <cstring>
 #include <dlfcn.h>
 #include <gtkmm.h>
@@ -13,7 +14,8 @@ namespace flexed {
 
     mode_loader::mode_loader(editor* ed) {
         this->ed = ed;
-        mode_search_path = FLEXED_MODE_PATH;
+        mode_search_path = getenv("HOME");
+        mode_search_path += "/.flexed/";
     }
 
     mode_loader::~mode_loader() {
@@ -41,7 +43,7 @@ namespace flexed {
         }
         else {
             std::string real_name = mode_name;
-            std::string fpath = FLEXED_MODE_PATH;
+            std::string fpath = mode_search_path;
             real_name = replace_minus_with_underscore(real_name);
             fpath += real_name + "/";
             std::string lib_name = real_name;

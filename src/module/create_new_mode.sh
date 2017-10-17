@@ -25,7 +25,7 @@ void $1_end() {
     g_print("$1_end() called\n");
 }
 
-void $1_start() {
+void $1_start(editor* ed) {
     g_print("$1_start() called\n");
 }
 

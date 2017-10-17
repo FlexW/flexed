@@ -1,6 +1,8 @@
 #ifndef INIT_FLEXED_H_
 #define INIT_FLEXED_H_
 
+#include <flexed_editor.h>
+
 namespace flexed {
 
 extern "C" {

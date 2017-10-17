@@ -1,6 +1,5 @@
 #include <gtkmm.h>
 
-#include "../../flexed_editor.h"
 #include "init_flexed.h"
 
 namespace flexed {

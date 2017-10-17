@@ -15,6 +15,7 @@ MODE_UPPERCASE=$(echo $MODE_UPPERCASE)$(echo "_FLEXED_H_")
 
 cat > "$1_flexed.cpp" << EOF
 #include <gtkmm.h>
+#include <flexed_editor.h>
 
 #include "$1_flexed.h"
 
@@ -83,6 +84,7 @@ link_directories(
 include_directories(
   \${GTKMM_INCLUDE_DIRS}
   \${GTKSOURCEVIEWMM_INCLUDE_DIRS}
+  "/usr/include/flexed"
   )
 
 add_library(flexed_$1 SHARED $1_flexed.cpp)
@@ -91,7 +93,12 @@ target_link_libraries(
   flexed_$1
   \${GTKMM_LIBRARIES}
   \${GTKSOURCEVIEWMM_LIBRARIES}
-  libflexed
+  flexed
+  )
+
+install(
+  TARGETS flexed_$1
+  DESTINATION "/usr/lib/flexed"
   )
 EOF
 

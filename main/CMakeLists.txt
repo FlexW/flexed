@@ -18,13 +18,18 @@ include_directories(
   )
 
 add_executable(
-  flexed
+  fxed
   main.cpp
   )
 
 target_link_libraries(
-  flexed
+  fxed
   ${GTKMM_LIBRARIES}
   ${GTKSOURCEVIEWMM_LIBRARIES}
-  libflexed
+  flexed
+  )
+
+install(
+  TARGETS fxed
+  DESTINATION "/usr/bin"
   )

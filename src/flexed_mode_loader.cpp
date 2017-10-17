@@ -14,8 +14,7 @@ namespace flexed {
 
     mode_loader::mode_loader(editor* ed) {
         this->ed = ed;
-        mode_search_path = getenv("HOME");
-        mode_search_path += "/.flexed/";
+        mode_search_path = "/usr/lib/flexed";
     }
 
     mode_loader::~mode_loader() {
@@ -44,8 +43,9 @@ namespace flexed {
         else {
             std::string real_name = mode_name;
             std::string fpath = mode_search_path;
-            real_name = replace_minus_with_underscore(real_name);
-            fpath += real_name + "/";
+            //real_name = replace_minus_with_underscore(real_name);
+            //fpath += real_name + "/";
+            fpath += "/";
             std::string lib_name = real_name;
             fpath += mode_name_to_lib_name(lib_name);
             FILE_LOG(LOG_DEBUG1) << "Try to load: " << fpath;

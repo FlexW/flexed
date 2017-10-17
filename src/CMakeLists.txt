@@ -36,7 +36,7 @@ SET(CMAKE_CXX_FLAGS
   )
 
 add_library(
-  libflexed SHARED
+  flexed SHARED
   flexed_editor.cpp
   flexed_editor.h
   flexed_text_buffer.cpp
@@ -63,10 +63,32 @@ add_library(
   )
 
 target_link_libraries(
-  libflexed
+  flexed
   ${GDKMM_LIBRARIES}
   ${GTKMM_LIBRARIES}
   ${GTKSOURCEVIEWMM_LIBRARIES}
   ${Boost_LIBRARIES}
   ${CMAKE_DL_LIBS}
+  )
+
+install(
+  TARGETS flexed
+  DESTINATION "/usr/lib"
+  )
+
+install(
+  FILES
+  flexed_editor.h
+  flexed_text_buffer.h
+  flexed_text_view.h
+  flexed_paned.h
+  flexed_global_text_buffer_container.h
+  flexed_text_buffer_container.h
+  flexed_mode_loader.h
+  flexed_status_bar_view.h
+  flexed_cmd_bar_view.h
+  orderd_container.h
+  keyboard_handler.h
+  keyboard_map.h
+  DESTINATION "/usr/include/flexed"
   )

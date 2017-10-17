@@ -22,6 +22,7 @@ link_directories(
 include_directories(
   ${GTKMM_INCLUDE_DIRS}
   ${GTKSOURCEVIEWMM_INCLUDE_DIRS}
+  "/usr/include/flexed"
   )
 
 add_library(flexed_smart_parens SHARED smart_parens_flexed.cpp)
@@ -30,5 +31,10 @@ target_link_libraries(
   flexed_smart_parens
   ${GTKMM_LIBRARIES}
   ${GTKSOURCEVIEWMM_LIBRARIES}
-  libflexed
+  flexed
+  )
+
+install(
+  TARGETS flexed_smart_parens
+  DESTINATION "/usr/lib/flexed"
   )

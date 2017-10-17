@@ -21,6 +21,7 @@ link_directories(
 include_directories(
   ${GTKMM_INCLUDE_DIRS}
   ${GTKSOURCEVIEWMM_INCLUDE_DIRS}
+  "/usr/include/flexed"
   )
 
 add_library(flexed_init SHARED init_flexed.cpp)
@@ -29,5 +30,10 @@ target_link_libraries(
   flexed_init
   ${GTKMM_LIBRARIES}
   ${GTKSOURCEVIEWMM_LIBRARIES}
-  libflexed
+  flexed
+  )
+
+install(
+  TARGETS flexed_init
+  DESTINATION "/usr/lib/flexed"
   )

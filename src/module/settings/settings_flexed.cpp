@@ -38,8 +38,19 @@ namespace flexed {
         instance->unset_linnum();
     }
 
+    void settings_set_linnum_global() {
+        instance->set_linnum_global();
+    }
+
+    void settings_unset_linnum_global() {
+        instance->unset_linnum_global();
+    }
+
     settings::settings(editor* ed) {
         this->ed = ed;
+        global_linnum_mode = false;
+        ed->signal_text_view_created()
+            .connect(sigc::mem_fun(*this, &settings::on_text_view_created));
     }
 
     settings::~settings() {
@@ -54,8 +65,24 @@ namespace flexed {
     }
 
     void settings::set_linnum_global() {
+        auto views = ed->get_text_views();
+        for (auto view : views) {
+            view->set_show_line_numbers(true);
+        }
+        global_linnum_mode = true;
     }
 
     void settings::unset_linnum_global() {
+        auto views = ed->get_text_views();
+        for (auto view : views) {
+            view->set_show_line_numbers(false);
+        }
+        global_linnum_mode = false;
+    }
+
+    void settings::on_text_view_created(text_view& view) {
+        if (global_linnum_mode) {
+            view.set_show_line_numbers();
+        }
     }
 }

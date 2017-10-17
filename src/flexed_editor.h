@@ -53,7 +53,7 @@ namespace flexed {
          * every time a text view gets created.
          * @returns Signal text view created.
          */
-        sigc::signal<text_view&>& signal_text_view_created();
+        sigc::signal<void, text_view&>& signal_text_view_created();
 
         /**
          * Gets the signal text view removed.
@@ -61,7 +61,7 @@ namespace flexed {
          * every time a text view gets removed.
          * @returns Signal text view removed.
          */
-        sigc::signal<text_view&>& signal_text_view_removed();
+        sigc::signal<void, text_view&>& signal_text_view_removed();
 
         /**
          * Gets the buffer of the active text view.
@@ -403,9 +403,9 @@ namespace flexed {
 
         sigc::signal<void> sig_buffer_changed;
 
-        sigc::signal<text_view&> sig_text_view_created;
+        sigc::signal<void, text_view&> sig_text_view_created;
 
-        sigc::signal<text_view&> sig_text_view_removed;
+        sigc::signal<void, text_view&> sig_text_view_removed;
 
         keyboard_handler keyboard;
 

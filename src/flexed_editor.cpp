@@ -27,11 +27,11 @@ namespace flexed {
         return sig_buffer_changed;
     }
 
-    sigc::signal<text_view&>& editor::signal_text_view_created() {
+    sigc::signal<void, text_view&>& editor::signal_text_view_created() {
         return sig_text_view_created;
     }
 
-    sigc::signal<text_view&>& editor::signal_text_view_removed() {
+    sigc::signal<void, text_view&>& editor::signal_text_view_removed() {
         return sig_text_view_removed;
     }
 
@@ -388,6 +388,8 @@ namespace flexed {
         if ((Gtk::Box*)active_sw->get_parent() == &main_box) {
             return;
         }
+
+        sig_text_view_removed.emit(*(text_view*)active_tv);
 
         auto active_paned = (paned*)active_sw->get_parent();
         if ((Gtk::Box*)active_paned->get_parent() == &main_box) {
@@ -933,6 +935,7 @@ namespace flexed {
         auto w = new Gtk::ScrolledWindow();
         w->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
         w->add(*tv);
+        sig_text_view_created.emit(*tv);
         return w;
     }
 }

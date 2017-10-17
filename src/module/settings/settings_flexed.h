@@ -3,7 +3,8 @@
 
 namespace flexed {
 
-class editor;
+    class editor;
+    class text_view;
 
 extern "C" {
     void settings_end();
@@ -14,6 +15,10 @@ extern "C" {
     void settings_set_linnum();
 
     void settings_unset_linnum();
+
+    void settings_set_linnum_global();
+
+    void settings_unset_linnum_global();
 }
 
     class settings {
@@ -45,6 +50,10 @@ extern "C" {
     private:
 
         editor* ed;
+
+        bool global_linnum_mode;
+
+        void on_text_view_created(text_view& view);
     };
 
 }

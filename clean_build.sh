@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rm -Rf build_debug/
+rm -Rf build/

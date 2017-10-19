@@ -5,5 +5,5 @@ export CC=clang
 
 mkdir build_modules
 cd build_modules
-cmake -DCMAKE_BUILD_TYPE=Debug ../src/module/
+cmake ../
 make && make install

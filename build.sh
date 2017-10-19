@@ -5,7 +5,7 @@ export CC=clang
 
 mkdir -v build
 cd build/
-cmake -DCMAKE_BUILD_TYPE=Debug ../
+cmake
 make && make install
 
 cd ..

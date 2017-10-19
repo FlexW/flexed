@@ -8,7 +8,7 @@ SET(
   )
 
 SET(CMAKE_CXX_FLAGS
-  ${CMAKE_CXX_FLAGS} "-Wno-cpp"
+  ${CMAKE_CXX_FLAGS} "-Wno-#warnings"
   )
 
 pkg_check_modules(GTKMM gtkmm-3.0)

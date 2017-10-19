@@ -137,6 +137,7 @@ bool mode_loader::call_mode_buffer_start_function(std::string& mode_name) {
     FILE_LOG(LOG_DEBUG1) << "Call buffer start func: " << fname
                          << " in mode: " << mode_name;
     call_function(l, fname);
+    return true;
 }
 
 void mode_loader::call_mode_buffer_end_function(std::string& mode_name) {

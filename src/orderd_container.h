@@ -71,7 +71,6 @@ public:
    * @returns Element, if no elements in container: nullptr.
    */
   T active() {
-    g_print("active: %p\n", obj_vec.front());
     return obj_vec.front();
   }
 

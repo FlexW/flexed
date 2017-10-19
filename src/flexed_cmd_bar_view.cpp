@@ -83,5 +83,6 @@ namespace flexed {
 
     bool cmd_bar_view::on_focus_out_event(/*Gdk::EventFocus& gdk_event*/) {
         abort_cmd();
+        return false;
     }
 }

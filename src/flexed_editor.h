@@ -179,6 +179,11 @@ namespace flexed {
         void switch_fullscreen();
 
         /**
+         * Prompts the user for switching to another buffer.
+         */
+        void switch_buffer_prompt();
+
+        /**
          * Opens a text file.
          * Creates a buffer for the file,
          * takes care that not one file is opend twice.
@@ -427,6 +432,12 @@ namespace flexed {
          * @param buffer Buffer to remove.
          */
         void remove_buffer(Glib::RefPtr<text_buffer> buffer);
+
+        /**
+         * Switches to the buffer with the given name.
+         * @param buffer_name Name of buffer.
+         */
+        void switch_buffer(Glib::ustring buffer_name);
 
     private:
 

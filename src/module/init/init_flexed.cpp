@@ -67,6 +67,9 @@ void init_start(editor *ed) {
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_fullscreen>(
         "F11", ed);
+
+    g_keyboard_map->set_key_binding<editor, &editor::switch_buffer_prompt>(
+        "Cxb", ed);
 }
 
 void init_buffer_end() {

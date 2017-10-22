@@ -127,6 +127,11 @@ namespace flexed {
         fullscreen();
     }
 
+    void editor::switch_buffer_prompt() {
+        cmd_bar->prompt_cmd_bar<editor, &editor::switch_buffer>(
+            "Switch buffer", this);
+    }
+
     void editor::open_file_prompt() {
         cmd_bar->prompt_cmd_bar<editor, &editor::open_file>("Open file",
                                                             this);
@@ -667,6 +672,16 @@ namespace flexed {
         }
         set_ask_for_save_file_buffer(buffer);
         ask_for_save_prompt();
+    }
+
+    void editor::switch_buffer(Glib::ustring buffer_name) {
+        if (active_text_view == nullptr) {
+            return;
+        }
+        auto bcontainer = text_view_map.find(active_text_view)->second;
+        bcontainer->switch_buffer((std::string&)buffer_name);
+        status_bar->set_filename();
+        status_bar->set_file_stats();
     }
 
     void editor::remove_buffer(Glib::RefPtr<text_buffer> buffer) {

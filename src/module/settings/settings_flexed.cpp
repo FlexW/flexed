@@ -38,14 +38,6 @@ namespace flexed {
         instance->unset_linnum();
     }
 
-    void settings_set_linnum_global() {
-        instance->set_linnum_global();
-    }
-
-    void settings_unset_linnum_global() {
-        instance->unset_linnum_global();
-    }
-
     settings::settings(editor* ed) {
         this->ed = ed;
         global_linnum_mode = false;

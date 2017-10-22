@@ -163,10 +163,9 @@ protected:
    */
   virtual void on_previous() {}
 
-private:
-
   /**
-   * Swaps two elements from obj_vec. If one position out of range, nothing happens.
+   * Swaps two elements from obj_vec.
+   * If one position out of range, nothing happens.
    * @param pos1 Position element 1.
    * @param pos2 Position element 2.
    */

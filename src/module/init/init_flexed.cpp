@@ -68,10 +68,8 @@ void init_start(editor *ed) {
     g_keyboard_map->set_key_binding<editor, &editor::switch_fullscreen>(
         "F11", ed);
 
-    //ed->get_mode_loader()->add_mode_hook("settings", "smart_parens");
-    //ed->get_mode_loader()->add_mode_hook("settings", "dired");
-    //ed->get_mode_loader()->add_mode_load_on_file_open("c", "settings");
-    //ed->get_mode_loader()->add_mode_load_on_file_open("c", "smart_parens");
+    g_keyboard_map->set_key_binding<editor, &editor::switch_buffer_prompt>(
+        "Cxb", ed);
 }
 
 void init_buffer_end() {

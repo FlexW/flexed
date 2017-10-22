@@ -52,6 +52,16 @@ void text_buffer_container::set_buffer() {
   text_view->set_buffer(active());
 }
 
+    void text_buffer_container::switch_buffer(std::string& buffer_name) {
+        auto index = find_buffer_by_name(buffer_name);
+        FILE_LOG(LOG_DEBUG2) << "Index: " << index;
+        if (index == -1) {
+            return;
+        }
+        swap_element(0, index);
+        set_buffer();
+    }
+
 void text_buffer_container::on_next() {
   set_buffer();
 }
@@ -59,5 +69,18 @@ void text_buffer_container::on_next() {
 void text_buffer_container::on_previous() {
   set_buffer();
 }
+
+    int text_buffer_container::find_buffer_by_name(std::string& buffer_name) {
+        int index = 0;
+        FILE_LOG(LOG_DEBUG2) << "buffer name to search: " << buffer_name;
+        for (auto buffer : obj_vec) {
+            FILE_LOG(LOG_DEBUG2) << "buffer name: " << buffer->get_name();
+            if (buffer->get_name() == buffer_name) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
 
 }

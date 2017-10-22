@@ -50,8 +50,8 @@ class editor;
 
 extern "C" {
     void $1_end();
-    void $1_start();
-    void $1_buffer_start(editor* ed);
+    void $1_start(editor* ed);
+    void $1_buffer_start();
     void $1_buffer_end();
 }
 

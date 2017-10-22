@@ -5,5 +5,5 @@ export CC=clang
 
 mkdir build_modules
 cd build_modules
-cmake ../
+cmake ../src/module/
 make && make install

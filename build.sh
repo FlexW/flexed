@@ -5,7 +5,7 @@ export CC=clang
 
 mkdir -v build
 cd build/
-cmake
+cmake ../
 make && make install
 
 cd ..

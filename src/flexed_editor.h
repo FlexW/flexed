@@ -80,6 +80,14 @@ namespace flexed {
         signal_text_buffer_removed();
 
         /**
+         * Gets the signal file opened.
+         * This signal will be emitted every time a file gets opened.
+         * @returns Signal text buffer removed.
+         */
+        sigc::signal<void, Glib::RefPtr<text_buffer>, std::string&>&
+        signal_file_opened();
+
+        /**
          * Gets the buffer of the active text view.
          * @returns Buffer.
          */
@@ -459,6 +467,9 @@ namespace flexed {
         sigc::signal< void, Glib::RefPtr<text_buffer> > sig_text_buffer_created;
 
         sigc::signal< void, Glib::RefPtr<text_buffer> > sig_text_buffer_removed;
+
+        sigc::signal<void, Glib::RefPtr<text_buffer>, std::string&>
+        sig_file_opened;
 
         keyboard_handler keyboard;
 

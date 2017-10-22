@@ -18,6 +18,8 @@ namespace flexed {
         mode_search_path = "/usr/lib/flexed";
         ed->signal_text_buffer_created()
             .connect(sigc::mem_fun(*this, &mode_loader::on_buffer_created));
+        ed->signal_file_opened()
+            .connect(sigc::mem_fun(*this, &mode_loader::on_file_opened));
     }
 
     mode_loader::~mode_loader() {
@@ -71,6 +73,7 @@ namespace flexed {
             //call_mode_start_function(mode_handle, mode_name);
         }
         add_mode(buffer, mode_name);
+        call_hooks(buffer, mode_name);
         //call_mode_buffer_start_function(mode_name);
         return true;
     }
@@ -151,6 +154,18 @@ namespace flexed {
             }
         }
         FILE_LOG(LOG_INFO) << "Function not found";
+    }
+
+    void mode_loader::add_mode_hook(const std::string& mode_name,
+                                    const std::string& hook_mode_name) {
+        mode_hook_map.insert(
+            std::pair<std::string, std::string>(mode_name, hook_mode_name));
+    }
+
+    void mode_loader::add_mode_load_on_file_open(
+        const std::string& file_extension, const std::string& mode_name) {
+        file_ext_mode_map.insert(
+            std::pair<std::string, std::string>(file_extension, mode_name));
     }
 
     void mode_loader::call_mode_start_function(void *handle,
@@ -236,6 +251,13 @@ namespace flexed {
         }
     }
 
+    void mode_loader::on_file_opened(Glib::RefPtr<text_buffer> buffer,
+                                     std::string& fname) {
+        auto extension = get_file_extension(fname);
+        FILE_LOG(LOG_DEBUG2) << "File extension is: " << extension;
+        load_modes_on_file_extension(buffer, extension);
+    }
+
     bool mode_loader::is_mode_loaded(std::string& mode_name) {
         auto iter_mode_handle = mode_handle_map.find(mode_name);
         if (iter_mode_handle != mode_handle_map.end()) {
@@ -276,5 +298,33 @@ namespace flexed {
                                std::string& mode_name) {
         buffer->add_mode(mode_name);
         call_mode_buffer_start_function(mode_name);
+    }
+
+    void mode_loader::call_hooks(Glib::RefPtr<text_buffer> buffer,
+                                 std::string& mode_name) {
+        auto ret = mode_hook_map.equal_range(mode_name);
+        for (auto iter = ret.first; iter != ret.second; iter++) {
+            load_mode(buffer, iter->second);
+        }
+    }
+
+    void mode_loader::load_modes_on_file_extension(
+        Glib::RefPtr<text_buffer> buffer, std::string& extension) {
+        auto ret = file_ext_mode_map.equal_range(extension);
+        for (auto iter = ret.first; iter != ret.second; iter++) {
+            load_mode(buffer,  iter->second);
+        }
+    }
+
+    std::string mode_loader::get_file_extension(std::string& filename) {
+        std::string ext = "";
+        int len = filename.length();
+        for (int i = len - 1; i >= 0; i--) {
+            if (filename[i] == '.') {
+                return ext;
+            }
+            ext.insert(ext.begin(), filename[i]);
+        }
+        return ext;
     }
 }

@@ -45,6 +45,11 @@ namespace flexed {
         return sig_text_buffer_removed;
     }
 
+    sigc::signal<void, Glib::RefPtr<text_buffer>, std::string&>&
+    editor::signal_file_opened() {
+        return sig_file_opened;
+    }
+
     Glib::RefPtr<text_buffer> editor::get_active_text_view_buffer() {
         auto buffer = active_text_view->get_text_buffer();
         //auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
@@ -168,6 +173,8 @@ namespace flexed {
         }
         file->close();
         delete file;
+
+        sig_file_opened.emit(get_active_text_view_buffer(), abs_path_str);
 
         utext = text;
         new_buffer->set_text(text);

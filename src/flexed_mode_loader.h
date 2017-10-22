@@ -76,6 +76,26 @@ public:
      */
     void call_function(std::list<std::string>& mode_list, std::string& name);
 
+    /**
+     * Creates a hook on a mode. If one wants a special mode to be loaded,
+     * after the mode with mode_name has loaded, one can here add a hook.
+     * @param mode_name Name of mode
+     * @param hook_mode_name Name of mode that should be loaded if mode_name
+     * has been loaded.
+     */
+    void add_mode_hook(const std::string& mode_name,
+                       const std::string& hook_mode_name);
+
+    /**
+     * Configures to load a mode if in the editor a file with the given
+     * extension gets opened.
+     * @param file_extension Extension of file without .
+     * Example: c for *.c file.
+     * @param mode_name Mode to load.
+     */
+    void add_mode_load_on_file_open(const std::string& file_extension,
+                                    const std::string& mode_name);
+
 private:
 
     editor *ed;
@@ -85,6 +105,12 @@ private:
 
     /** Stores the handles to all open modes. */
     std::multimap<std::string, void*> mode_handle_map;
+
+    /** Stores modes that should be loaded if mode has been loaded. */
+    std::multimap<std::string, std::string> mode_hook_map;
+
+    /** Stores modes that should be loaded if a special file gets opened. */
+    std::multimap<std::string, std::string> file_ext_mode_map;
 
     /** Stores the name of modes that are open in buffers. */
     //std::multimap<std::string, std::string> mode_buffer_map;
@@ -147,6 +173,13 @@ private:
     void on_buffer_created(Glib::RefPtr<text_buffer> buffer);
 
     /**
+     * Gets called if a file gets opened.
+     * @param buffer The buffer in that the file was opened.
+     * @param fname The name of the file.
+     */
+    void on_file_opened(Glib::RefPtr<text_buffer> buffer, std::string& fname);
+
+    /**
      * Determines if the mode is loaded into memory.
      * @param mode_name Name of the mode.
      * @returns true if is loaded, false if not.
@@ -173,6 +206,22 @@ private:
      * @param mode_name Name of mode.
      */
     void add_mode(Glib::RefPtr<text_buffer> buffer, std::string& mode_name);
+
+    /**
+     * Calls all modes that should be loaded if the mode has been loaded.
+     * @param mode_name Name of mode.
+     */
+    void call_hooks(Glib::RefPtr<text_buffer> buffer, std::string& mode_name);
+
+    /**
+     * Loads all modes that should be loaded on the given extension.
+     * @param buffer Buffer to load modes in.
+     * @param extension File extension without . Example: *.c c
+     */
+    void load_modes_on_file_extension(Glib::RefPtr<text_buffer> buffer,
+                                      std::string& extension);
+
+    std::string get_file_extension(std::string& filename);
 };
 
 }

@@ -50,7 +50,8 @@ public:
   /**
    * Sets a key binding.
    * @param key_binding Key binding.
-   * @returns If key binding is unique and element could be insert, true else false.
+   * @returns If key binding is unique and element could be insert,
+   * true else false.
    */
   template<class C, void (C::*handler)()>
   bool set_key_binding(const std::string& key_binding, C *instance) {
@@ -129,14 +130,18 @@ void insert_key_binding(const std::string& key_binding, stub* val_p) {
   }
   if (kb_split[1].size() >= 1) {
     if (kb_split[2].size() >= 1) {
-      k_map_state2.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1], nullptr));
+      k_map_state2.insert(
+          std::pair<std::string, stub*>(kb_split[0] + kb_split[1], nullptr));
     }
     else {
-      k_map_state2.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1], val_p));
+      k_map_state2.insert(
+          std::pair<std::string, stub*>(kb_split[0] + kb_split[1], val_p));
     }
   }
   if (kb_split[2].size() >= 1) {
-    k_map_state3.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1] + kb_split[2], val_p));
+    k_map_state3.insert(
+        std::pair<std::string, stub*>(
+            kb_split[0] + kb_split[1] + kb_split[2], val_p));
   }
 }
 

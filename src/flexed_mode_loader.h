@@ -76,6 +76,16 @@ public:
      */
     void call_function(std::list<std::string>& mode_list, std::string& name);
 
+    /**
+     * Creates a hook on a mode. If one wants a special mode to be loaded,
+     * after the mode with mode_name has loaded, one can here add a hook.
+     * @param mode_name Name of mode
+     * @param hook_mode_name Name of mode that should be loaded if mode_name
+     * has been loaded.
+     */
+    void add_mode_hook(const std::string& mode_name,
+                       const std::string& hook_mode_name);
+
 private:
 
     editor *ed;
@@ -85,6 +95,9 @@ private:
 
     /** Stores the handles to all open modes. */
     std::multimap<std::string, void*> mode_handle_map;
+
+    /** Stores modes that should be loaded if mode has been loaded. */
+    std::multimap<std::string, std::string> mode_hook_map;
 
     /** Stores the name of modes that are open in buffers. */
     //std::multimap<std::string, std::string> mode_buffer_map;
@@ -173,6 +186,12 @@ private:
      * @param mode_name Name of mode.
      */
     void add_mode(Glib::RefPtr<text_buffer> buffer, std::string& mode_name);
+
+    /**
+     * Calls all modes that should be loaded if the mode has been loaded.
+     * @param mode_name Name of mode.
+     */
+    void call_hooks(Glib::RefPtr<text_buffer> buffer, std::string& mode_name);
 };
 
 }

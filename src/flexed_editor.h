@@ -64,6 +64,22 @@ namespace flexed {
         sigc::signal<void, text_view&>& signal_text_view_removed();
 
         /**
+         * Gets the signal text buffer created.
+         * This signal will be emitted every time a buffer gets created.
+         * @returns Signal text buffer created.
+         */
+        sigc::signal< void, Glib::RefPtr<text_buffer> >&
+        signal_text_buffer_created();
+
+        /**
+         * Gets the signal text buffer removed.
+         * This signal will be emitted every time a buffer gets removed.
+         * @returns Signal text buffer removed.
+         */
+        sigc::signal< void, Glib::RefPtr<text_buffer> >&
+        signal_text_buffer_removed();
+
+        /**
          * Gets the buffer of the active text view.
          * @returns Buffer.
          */
@@ -406,6 +422,10 @@ namespace flexed {
         sigc::signal<void, text_view&> sig_text_view_created;
 
         sigc::signal<void, text_view&> sig_text_view_removed;
+
+        sigc::signal< void, Glib::RefPtr<text_buffer> > sig_text_buffer_created;
+
+        sigc::signal< void, Glib::RefPtr<text_buffer> > sig_text_buffer_removed;
 
         keyboard_handler keyboard;
 

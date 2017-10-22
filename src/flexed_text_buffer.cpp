@@ -36,7 +36,7 @@ std::shared_ptr<keyboard_map> text_buffer::get_keyboard_map() {
 
 void text_buffer::add_mode(std::string& m) {
     FILE_LOG(LOG_INFO) << "Add mode: " << m;
-  mode_list.push_back(m);
+    mode_list.push_back(m);
 }
 
 void text_buffer::unset_mode(std::string& m ) {

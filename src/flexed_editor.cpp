@@ -35,6 +35,16 @@ namespace flexed {
         return sig_text_view_removed;
     }
 
+    sigc::signal< void, Glib::RefPtr<text_buffer> >&
+    editor::signal_text_buffer_created() {
+        return sig_text_buffer_created;
+    }
+
+    sigc::signal< void, Glib::RefPtr<text_buffer> >&
+    editor::signal_text_buffer_removed() {
+        return sig_text_buffer_removed;
+    }
+
     Glib::RefPtr<text_buffer> editor::get_active_text_view_buffer() {
         auto buffer = active_text_view->get_buffer();
         auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
@@ -633,6 +643,7 @@ namespace flexed {
     }
 
     void editor::remove_buffer(Glib::RefPtr<text_buffer> buffer) {
+        sig_text_buffer_removed.emit(buffer);
         g_text_buffer_container->remove(buffer);
     }
 
@@ -764,6 +775,7 @@ namespace flexed {
         auto cur_pos_prop = new_buffer->property_cursor_position();
         cur_pos_prop.signal_changed().connect(
             sigc::mem_fun(*status_bar, &status_bar_view::set_file_stats));
+        sig_text_buffer_created.emit(new_buffer);
         return new_buffer;
     }
 

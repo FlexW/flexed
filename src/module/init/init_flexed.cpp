@@ -70,6 +70,8 @@ void init_start(editor *ed) {
 
     //ed->get_mode_loader()->add_mode_hook("settings", "smart_parens");
     //ed->get_mode_loader()->add_mode_hook("settings", "dired");
+    //ed->get_mode_loader()->add_mode_load_on_file_open("c", "settings");
+    //ed->get_mode_loader()->add_mode_load_on_file_open("c", "smart_parens");
 }
 
 void init_buffer_end() {

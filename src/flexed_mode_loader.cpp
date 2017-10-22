@@ -71,6 +71,7 @@ namespace flexed {
             //call_mode_start_function(mode_handle, mode_name);
         }
         add_mode(buffer, mode_name);
+        call_hooks(buffer, mode_name);
         //call_mode_buffer_start_function(mode_name);
         return true;
     }
@@ -151,6 +152,12 @@ namespace flexed {
             }
         }
         FILE_LOG(LOG_INFO) << "Function not found";
+    }
+
+    void mode_loader::add_mode_hook(const std::string& mode_name,
+                                    const std::string& hook_mode_name) {
+        mode_hook_map.insert(
+            std::pair<std::string, std::string>(mode_name, hook_mode_name));
     }
 
     void mode_loader::call_mode_start_function(void *handle,
@@ -276,5 +283,13 @@ namespace flexed {
                                std::string& mode_name) {
         buffer->add_mode(mode_name);
         call_mode_buffer_start_function(mode_name);
+    }
+
+    void mode_loader::call_hooks(Glib::RefPtr<text_buffer> buffer,
+                                 std::string& mode_name) {
+        auto ret = mode_hook_map.equal_range(mode_name);
+        for (auto iter = ret.first; iter != ret.second; iter++) {
+            load_mode(buffer, iter->second);
+        }
     }
 }

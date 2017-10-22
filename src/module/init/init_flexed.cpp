@@ -67,6 +67,9 @@ void init_start(editor *ed) {
 
     g_keyboard_map->set_key_binding<editor, &editor::switch_fullscreen>(
         "F11", ed);
+
+    //ed->get_mode_loader()->add_mode_hook("settings", "smart_parens");
+    //ed->get_mode_loader()->add_mode_hook("settings", "dired");
 }
 
 void init_buffer_end() {

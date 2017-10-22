@@ -40,19 +40,19 @@ public:
     void set_mode_search_path(std::string& path);
 
     /**
-     * Loads a mode into memory. If the mode is already loaded,
-     * it does nothing.
-     * @param name Name of the mode.
+     * Opens a mode in a buffer.
+     * @param buffer Buffer.
+     * @param mode_name Name of the mode.
      * @returns true if mode successfully loaded. false if not.
      */
-    bool load_mode(std::string& buffer_name, std::string& mode_name);
+    bool load_mode(Glib::RefPtr<text_buffer> buffer, std::string& mode_name);
 
     /**
      * Unloads a mode from the given buffer.
      * @param buffer_name Name of the buffer.
      * @param mode_name Name of the mode.
      */
-    void unload_mode(std::string& buffer_name, std::string& mode_name);
+    void unload_mode(Glib::RefPtr<text_buffer> buffer, std::string& mode_name);
 
     /**
      * Loads a mode into memory and adds it to every open buffer and adds
@@ -87,7 +87,7 @@ private:
     std::multimap<std::string, void*> mode_handle_map;
 
     /** Stores the name of modes that are open in buffers. */
-    std::multimap<std::string, std::string> mode_buffer_map;
+    //std::multimap<std::string, std::string> mode_buffer_map;
 
     /**
      * The directory in which should be searched after modules.
@@ -141,25 +141,10 @@ private:
                                 std::string& buffer_name);
 
     /**
-     * Deletes the buffer from the mode_buffer_map.
-     * @param buffer_name Name of the buffer.
-     * @param mode_name Name of the mode.
-     */
-    void erase_mode_buffer_map(std::string& buffer_name,
-                               std::string& mode_name);
-
-    /**
      * Gets called every time a buffer gets created.
      * @param buffer The buffer that was created.
      */
     void on_buffer_created(Glib::RefPtr<text_buffer> buffer);
-
-    /**
-     * Determines if the mode is open in every buffer.
-     * @param mode_name Name of the mode.
-     * @return true if is open everywhere, false if not.
-     */
-    bool is_mode_in_every_buffer_open(std::string& mode_name);
 
     /**
      * Determines if the mode is loaded into memory.
@@ -169,17 +154,25 @@ private:
     bool is_mode_loaded(std::string& mode_name);
 
     /**
-     * Tries to load the mode into memory.
+     * Tries to load the mode into memory. Calls mode start function.
      * @param mode_name Name of the mode.
      * @returns nullptr if could not load. Handle to the shared lib if loaded.
      */
     void* load_mode_in_memory(std::string& mode_name);
 
     /**
-     * Adds the mode to every open buffer.
-     * @param mode_name Name of the mode.
+     * Gets the handle of a mode, if the mode is already loaded into memory.
+     * @param mode_name Name of mode.
+     * @returns Mode handle if mode found, nullptr if mode not found.
      */
-    void add_mode_to_every_buffer(std::string& mode_name);
+    void* get_mode_handle(std::string& mode_name);
+
+    /**
+     * Adds a mode to a buffer and calls the buffer start function.
+     * @param buffer Buffer.
+     * @param mode_name Name of mode.
+     */
+    void add_mode(Glib::RefPtr<text_buffer> buffer, std::string& mode_name);
 };
 
 }

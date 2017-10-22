@@ -56,6 +56,12 @@ void init_start(editor *ed) {
     g_keyboard_map->set_key_binding<editor, &editor::unload_mode_prompt>(
         "CmCu", ed);
 
+    g_keyboard_map->set_key_binding<editor, &editor::load_mode_global_prompt>(
+        "CgCl", ed);
+
+    g_keyboard_map->set_key_binding<editor, &editor::unload_mode_global_prompt>(
+        "CgCu", ed);
+
     g_keyboard_map->set_key_binding<editor, &editor::remove_active_text_buffer>(
         "CxCk", ed);
 

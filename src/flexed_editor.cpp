@@ -46,9 +46,9 @@ namespace flexed {
     }
 
     Glib::RefPtr<text_buffer> editor::get_active_text_view_buffer() {
-        auto buffer = active_text_view->get_buffer();
-        auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
-        return tbuffer;
+        auto buffer = active_text_view->get_text_buffer();
+        //auto tbuffer = Glib::RefPtr<text_buffer>::cast_dynamic(buffer);
+        return buffer;
     }
 
     std::shared_ptr<mode_loader> editor::get_mode_loader() {
@@ -173,22 +173,38 @@ namespace flexed {
         buf_container->previous();
 
         new_buffer->set_modified(false);
+        status_bar->set_filename();
         status_bar->set_file_stats();
     }
 
-        void editor::load_mode_prompt() {
+    void editor::load_mode_prompt() {
         cmd_bar->prompt_cmd_bar<editor, &editor::load_mode>("Load mode",
                                                             this);
     }
 
     void editor::load_mode(Glib::ustring name) {
         FILE_LOG(LOG_INFO) << "Try to load mode now";
-        if (fmode_loader->load_mode(
-                (std::string&)get_active_text_view_buffer()->get_name(),
-                (std::string&)name)) {
-            get_active_text_view_buffer()->add_mode((std::string&)name);
+        if (fmode_loader
+            ->load_mode(get_active_text_view_buffer(), (std::string&)name)) {
+            //get_active_text_view_buffer()->add_mode((std::string&)name);
             cmd_bar->set_cmd_bar_msg(name + " loaded");
+            return;
         }
+        cmd_bar->set_cmd_bar_msg(name + " not loaded");
+    }
+
+    void editor::load_mode_global_prompt() {
+        cmd_bar->prompt_cmd_bar<editor, &editor::load_mode_global>(
+            "Load mode global", this);
+    }
+
+    void editor::load_mode_global(Glib::ustring name) {
+        if (fmode_loader
+            ->load_mode_global((std::string&)name)) {
+            cmd_bar->set_cmd_bar_msg(name + " loaded global");
+            return;
+        }
+        cmd_bar->set_cmd_bar_msg(name + " not loaded global");
     }
 
     void editor::call_mode_function_prompt() {
@@ -212,11 +228,20 @@ namespace flexed {
 
     void editor::unload_mode(Glib::ustring name) {
         FILE_LOG(LOG_INFO) << "Try to unload mode now";
-        get_active_text_view_buffer()->unset_mode((std::string&)name);
-        fmode_loader->unload_mode(
-            (std::string&)get_active_text_view_buffer()->get_name(),
-            (std::string&)name);
+        //get_active_text_view_buffer()->unset_mode((std::string&)name);
+        fmode_loader
+            ->unload_mode(get_active_text_view_buffer(), (std::string&)name);
         cmd_bar->set_cmd_bar_msg(name + " unloaded");
+    }
+
+    void editor::unload_mode_global_prompt() {
+        cmd_bar->prompt_cmd_bar<editor, &editor::unload_mode_global>(
+            "Unload mode global", this);
+    }
+
+    void editor::unload_mode_global(Glib::ustring name) {
+        fmode_loader->unload_mode_global((std::string&)name);
+        cmd_bar->set_cmd_bar_msg(name + " unloaded global");
     }
 
     void editor::ask_for_save_prompt() {
@@ -367,6 +392,7 @@ namespace flexed {
         auto w = construct_editing_text_view();
         add_text_view_to_map((text_view*)w->get_child(),
                              *text_view_map.find(old_tv)->second);
+        active_text_view = (text_view*)w->get_child();
         return w;
     }
 
@@ -374,6 +400,7 @@ namespace flexed {
         auto w = construct_editing_text_view();
         add_text_view_to_map((text_view*)w->get_child(),
                              *g_text_buffer_container);
+        active_text_view = (text_view*)w->get_child();
         return w;
     }
 
@@ -694,7 +721,7 @@ namespace flexed {
     }
 
     void editor::setup_welcome_text_buffer() {
-        std::string first_buffer_name("*HOME*");
+        std::string first_buffer_name = "*HOME*";
         first_buffer = Glib::RefPtr<text_buffer>(new text_buffer());
         //first_buffer = create_text_buffer(first_buffer_name);
         first_buffer->set_text("Welcome to the flexed text editor.");
@@ -732,10 +759,10 @@ namespace flexed {
 
     bool editor::on_text_view_focus_changed(GdkEventFocus* focus_event) {
         if (start) {
-            g_print("editor instance this: %p\n", this);
             std::string init_mode_name = "init";
             std::string init_buffer_name = "*INIT*";
-            fmode_loader->load_mode(init_buffer_name, init_mode_name);
+            fmode_loader
+                ->load_mode(get_active_text_view_buffer(), init_mode_name);
             start = false;
             FILE_LOG(LOG_INFO) << "init mode loading finished";
         }

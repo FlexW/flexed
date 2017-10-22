@@ -204,6 +204,17 @@ namespace flexed {
         void load_mode(Glib::ustring name);
 
         /**
+         * Prompts the user for loading a mode global.
+         */
+        void load_mode_global_prompt();
+
+        /**
+         * Loads mode global.
+         * @param name Mode name.
+         */
+        void load_mode_global(Glib::ustring name);
+
+        /**
          * Prompts the user for calling a function of a mode.
          */
         void call_mode_function_prompt();
@@ -224,6 +235,17 @@ namespace flexed {
          * @param name Mode name.
          */
         void unload_mode(Glib::ustring name);
+
+        /**
+         * Prompts the user for unloading a mode global.
+         */
+        void unload_mode_global_prompt();
+
+        /**
+         * Unloads mode global.
+         * @param name Mode name.
+         */
+        void unload_mode_global(Glib::ustring name);
 
         /**
          * Asks the user if he/she wants to save a file.

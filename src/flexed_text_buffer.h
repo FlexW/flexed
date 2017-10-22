@@ -56,8 +56,8 @@ public:
   std::shared_ptr<keyboard_map> get_keyboard_map();
 
   /**
-   * Adds a mode to the buffer.
-   * @param m Mode.
+   * Adds a mode to the buffer. Takes care of not adding a mode twice.
+   * @param m Mode name.
    */
   void add_mode(std::string& m);
 
@@ -72,6 +72,13 @@ public:
    * @param m Mode name.
    */
   void unset_mode(std::string& m);
+
+
+    /**
+     * Determines if a mode is open.
+     * @param mode_name Name of mode.
+     */
+    bool is_mode_open(std::string& mode_name);
 
 private:
   Glib::ustring name;

@@ -27,65 +27,70 @@ namespace flexed {
         mode_search_path = path;
     }
 
-    bool mode_loader::load_mode(std::string& buffer_name,
+    bool mode_loader::load_mode(Glib::RefPtr<text_buffer> buffer,
                                 std::string& mode_name) {
         void* mode_handle = nullptr;
-        if (is_mode_in_buffer_open(mode_name, buffer_name)) {
+        if (buffer->is_mode_open(mode_name)) {
+            //if (is_mode_in_buffer_open(mode_name, buffer_name)) {
             FILE_LOG(LOG_INFO) << "Mode in buffer already open";
             return false;
         }
-        auto iter_mode_handle = mode_handle_map.find(mode_name);
-        if (iter_mode_handle != mode_handle_map.end()) {
+        if (is_mode_loaded(mode_name)) {
+            //auto iter_mode_handle = mode_handle_map.find(mode_name);
+            //if (iter_mode_handle != mode_handle_map.end()) {
             FILE_LOG(LOG_INFO) << "Mode already loaded";
-            mode_handle = iter_mode_handle->second;
+            mode_handle = get_mode_handle(mode_name);
+            //mode_handle = iter_mode_handle->second;
             mode_handle_map.insert(
                 std::pair<std::string, void*>(mode_name, mode_handle));
-            mode_buffer_map.insert(
-                std::pair<std::string, std::string>(mode_name, buffer_name));
+            //mode_buffer_map.insert(
+            //    std::pair<std::string, std::string>(mode_name, buffer_name));
         }
         else {
-            std::string real_name = mode_name;
-            std::string fpath = mode_search_path;
+            //std::string real_name = mode_name;
+            //std::string fpath = mode_search_path;
             //real_name = replace_minus_with_underscore(real_name);
             //fpath += real_name + "/";
-            fpath += "/";
-            std::string lib_name = real_name;
-            fpath += mode_name_to_lib_name(lib_name);
-            FILE_LOG(LOG_DEBUG1) << "Try to load: " << fpath;
-            mode_handle = dlopen(fpath.c_str(), RTLD_NOW);
+            //fpath += "/";
+            //std::string lib_name = real_name;
+            //fpath += mode_name_to_lib_name(lib_name);
+            //FILE_LOG(LOG_DEBUG1) << "Try to load: " << fpath;
+            //mode_handle = dlopen(fpath.c_str(), RTLD_NOW);
+            mode_handle = load_mode_in_memory(mode_name);
             if (mode_handle == nullptr) {
                 FILE_LOG(LOG_INFO) << "Mode not loaded";
                 return false;
             }
             mode_handle_map.insert(
                 std::pair<std::string, void*>(mode_name, mode_handle));
-            mode_buffer_map.insert(
-                std::pair<std::string, std::string>(mode_name, buffer_name));
+            //mode_buffer_map.insert(
+            //    std::pair<std::string, std::string>(mode_name, buffer_name));
             FILE_LOG(LOG_DEBUG1) << "Mode handle: " << mode_handle;
             FILE_LOG(LOG_DEBUG1) << "Saved mode as: " <<  mode_name;
             FILE_LOG(LOG_INFO) << "Mode loaded";
-            call_mode_start_function(mode_handle, mode_name);
+            //call_mode_start_function(mode_handle, mode_name);
         }
-        call_mode_buffer_start_function(mode_name);
+        add_mode(buffer, mode_name);
+        //call_mode_buffer_start_function(mode_name);
         return true;
     }
 
-    void mode_loader::unload_mode(std::string& buffer_name,
+    void mode_loader::unload_mode(Glib::RefPtr<text_buffer> buffer,
                                   std::string& mode_name) {
-        if (!is_mode_in_buffer_open(mode_name, buffer_name)) {
+        if (!buffer->is_mode_open(mode_name)) {
             FILE_LOG(LOG_INFO) << "Mode in buffer not open";
             return;
         }
         call_mode_buffer_end_function(mode_name);
+        buffer->unset_mode(mode_name);
         if (mode_handle_map.count(mode_name) == 1) {
-            FILE_LOG(LOG_INFO) << "Unload shared lib";
-            call_mode_end_function(mode_name);
-            dlclose(mode_handle_map.find(mode_name)->second);
+            //FILE_LOG(LOG_INFO) << "Unload shared lib";
+            //call_mode_end_function(mode_name);
+            //dlclose(mode_handle_map.find(mode_name)->second);
         }
-        FILE_LOG(LOG_INFO) << "Call buffer end func";
+
         auto iter_mode_handle = mode_handle_map.find(mode_name);
-        auto iter_mode_buffer = mode_buffer_map.find(mode_name);
-        erase_mode_buffer_map(buffer_name, mode_name);
+        buffer->unset_mode(mode_name);
         mode_handle_map.erase(iter_mode_handle);
     }
 
@@ -94,7 +99,7 @@ namespace flexed {
         // Then check if mode is already loaded into memory, if not load it
         // Add mode to every buffer
         // Add mode to global_mode_list
-        if (is_mode_in_every_buffer_open(mode_name)) {
+        /*if (is_mode_in_every_buffer_open(mode_name)) {
             return true;
         }
         if (!is_mode_loaded(mode_name)) {
@@ -105,11 +110,25 @@ namespace flexed {
             call_mode_start_function(mode_handle, mode_name);
         }
         add_mode_to_every_buffer(mode_name);
+        */
+        auto buffers = ed->get_global_text_buffer_container()->get_obj_vec();
+        for (auto buffer : buffers) {
+            load_mode(buffer, mode_name);
+        }
         global_mode_list.push_back(mode_name);
-        return false;
+        return true;
     }
 
     void mode_loader::unload_mode_global(std::string& mode_name) {
+        auto buffers = ed->get_global_text_buffer_container()->get_obj_vec();
+        for (auto buffer : buffers) {
+            unload_mode(buffer, mode_name);
+        }
+        auto iter = std::find(
+            global_mode_list.begin(), global_mode_list.end(), mode_name);
+        if (iter != global_mode_list.end()) {
+            global_mode_list.erase(iter);
+        }
     }
 
     void mode_loader::call_function(std::list<std::string>& mode_list,
@@ -211,40 +230,10 @@ namespace flexed {
         return name;
     }
 
-    bool mode_loader::is_mode_in_buffer_open(std::string& mode_name,
-                                             std::string& buffer_name) {
-        auto range = mode_buffer_map.equal_range(mode_name);
-        for (auto i = range.first; i != range.second; i++) {
-            if (i->second == buffer_name) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void mode_loader::erase_mode_buffer_map(std::string& buffer_name,
-                                            std::string& mode_name) {
-        auto range = mode_buffer_map.equal_range(mode_name);
-        for (auto i = range.first; i != range.second; i++) {
-            if (i->second == buffer_name) {
-                FILE_LOG(LOG_DEBUG1) << "Erase element in mode_buffer_map";
-                mode_buffer_map.erase(i);
-            }
-        }
-    }
-
     void mode_loader::on_buffer_created(Glib::RefPtr<text_buffer> buffer) {
-    }
-
-    bool mode_loader::is_mode_in_every_buffer_open(std::string& mode_name) {
-        auto buffers = ed->get_global_text_buffer_container()->get_obj_vec();
-        for (auto buffer : buffers) {
-            if (!is_mode_in_buffer_open(mode_name,
-                                        (std::string&)buffer->get_name())) {
-                return false;
-            }
+        for (auto mode : global_mode_list) {
+            load_mode(buffer, mode);
         }
-        return true;
     }
 
     bool mode_loader::is_mode_loaded(std::string& mode_name) {
@@ -271,18 +260,21 @@ namespace flexed {
         }
         mode_handle_map.insert(
             std::pair<std::string, void*>(mode_name, mode_handle));
+        call_mode_start_function(mode_handle, mode_name);
         return mode_handle;
     }
 
-    void mode_loader::add_mode_to_every_buffer(std::string& mode_name) {
-        auto buffers = ed->get_global_text_buffer_container()->get_obj_vec();
-        for (auto buffer : buffers) {
-            if (!is_mode_in_buffer_open(mode_name,
-                                        (std::string&)buffer->get_name())) {
-                mode_buffer_map.insert(
-                    std::pair<std::string, std::string>(
-                        mode_name, buffer->get_name()));
-            }
+    void* mode_loader::get_mode_handle(std::string& mode_name) {
+        auto iter = mode_handle_map.find(mode_name);
+        if (iter != mode_handle_map.end()) {
+            return iter->second;
         }
+        return nullptr;
+    }
+
+    void mode_loader::add_mode(Glib::RefPtr<text_buffer> buffer,
+                               std::string& mode_name) {
+        buffer->add_mode(mode_name);
+        call_mode_buffer_start_function(mode_name);
     }
 }

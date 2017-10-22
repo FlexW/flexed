@@ -35,6 +35,10 @@ std::shared_ptr<keyboard_map> text_buffer::get_keyboard_map() {
 }
 
 void text_buffer::add_mode(std::string& m) {
+    auto iter = std::find(mode_list.begin(), mode_list.end(), m);
+    if (iter != mode_list.end()) {
+        return;
+    }
     FILE_LOG(LOG_INFO) << "Add mode: " << m;
     mode_list.push_back(m);
 }
@@ -45,6 +49,14 @@ void text_buffer::unset_mode(std::string& m ) {
         mode_list.erase(iter);
     }
 }
+
+    bool text_buffer::is_mode_open(std::string& mode_name) {
+        auto iter = std::find(mode_list.begin(), mode_list.end(), mode_name);
+        if (iter != mode_list.end()) {
+            return true;
+        }
+        return false;
+    }
 
 std::list<std::string>& text_buffer::get_mode_list() {
   return mode_list;

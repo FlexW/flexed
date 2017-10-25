@@ -3,24 +3,24 @@
 
 namespace flexed {
 
-class editor;
+class editor_window;
 
 extern "C" {
     void dired_end();
-    void dired_start(editor* ed);
+    void dired_start(editor_window* ed);
     void dired_buffer_start();
     void dired_buffer_end();
 }
 
     class dired {
     public:
-        dired(editor* ed);
+        dired(editor_window* ed);
         virtual ~dired();
 
         void find_file();
 
     private:
-        editor* ed;;
+        editor_window* ed;;
     };
 
 }

@@ -1,5 +1,5 @@
 #include <gtkmm.h>
-#include <flexed_editor.h>
+#include <flexed_editor_window.h>
 
 #include "dired_flexed.h"
 
@@ -12,7 +12,7 @@ namespace flexed {
         delete dired_instance;
     }
 
-    void dired_start(editor* ed) {
+    void dired_start(editor_window* ed) {
         g_print("dired_start() called\n");
         dired_instance = new dired(ed);
     }
@@ -25,7 +25,7 @@ namespace flexed {
         g_print("dired_buffer_start() called\n");
     }
 
-    dired::dired(editor* ed) {
+    dired::dired(editor_window* ed) {
         this->ed = ed;
     }
 

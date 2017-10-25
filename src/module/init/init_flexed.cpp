@@ -8,64 +8,64 @@ void init_end() {
     g_print("init_end() called\n");
 }
 
-void init_start(editor *ed) {
+void init_start(editor_window *ed) {
     g_print("init_start() called\n");
     auto g_keyboard_map = ed->get_keyboard_map();
     g_print("init_start() end\n");
-    g_keyboard_map->set_key_binding<editor, &editor::insert_paned_horizontal>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::insert_paned_horizontal>(
         "Cx2", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::insert_paned_vertical>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::insert_paned_vertical>(
         "Cx3", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::remove_paned>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::remove_paned>(
         "Cx1", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::open_file_prompt>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::open_file_prompt>(
         "CxCf", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::switch_to_next_buffer>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::switch_to_next_buffer>(
         "CxR", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::switch_to_previous_buffer>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::switch_to_previous_buffer>(
         "CxL", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::switch_paned_up>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::switch_paned_up>(
         "AU", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::switch_paned_down>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::switch_paned_down>(
         "AD", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::switch_paned_left>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::switch_paned_left>(
         "AL", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::switch_paned_right>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::switch_paned_right>(
         "AR", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::call_mode_function_prompt>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::call_mode_function_prompt>(
         "Ax", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::save_file>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::save_file>(
         "CxCs", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::quit>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::quit>(
         "CxCq", ed);
-    g_keyboard_map->set_key_binding<editor, &editor::load_mode_prompt>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::load_mode_prompt>(
         "CmCl", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::unload_mode_prompt>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::unload_mode_prompt>(
         "CmCu", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::load_mode_global_prompt>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::load_mode_global_prompt>(
         "CgCl", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::unload_mode_global_prompt>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::unload_mode_global_prompt>(
         "CgCu", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::remove_active_text_buffer>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::remove_active_text_buffer>(
         "CxCk", ed);
 
-    g_keyboard_map->set_key_binding<editor, &editor::switch_fullscreen>(
+    g_keyboard_map->set_key_binding<editor_window, &editor_window::switch_fullscreen>(
         "F11", ed);
 }
 

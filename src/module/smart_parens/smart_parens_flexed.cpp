@@ -1,4 +1,5 @@
-#include "../../flexed_editor.h"
+#include <flexed_editor_window.h>
+
 #include "smart_parens_flexed.h"
 
 namespace flexed {
@@ -10,7 +11,7 @@ void smart_parens_end() {
     g_print("smart_parens_end() called\n");
 }
 
-void smart_parens_start(editor *ed) {
+void smart_parens_start(editor_window* ed) {
     g_print("smart_parens_start() called\n");
     instance = new smart_parens(ed);
 }
@@ -25,7 +26,7 @@ void smart_parens_buffer_start() {
     instance->init_key_bindings();
 }
 
-    smart_parens::smart_parens(editor *ed) {
+    smart_parens::smart_parens(editor_window* ed) {
         this->ed = ed;
     }
 

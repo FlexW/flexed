@@ -1,5 +1,5 @@
 #include <gtkmm.h>
-#include <flexed_editor.h>
+#include <flexed_editor_window.h>
 #include <flexed_text_view.h>
 
 #include "settings_flexed.h"
@@ -15,7 +15,7 @@ namespace flexed {
         g_print("settings_end() called\n");
     }
 
-    void settings_start(editor* ed) {
+    void settings_start(editor_window* ed) {
         if (instance == nullptr) {
             instance = new settings(ed);
         }
@@ -46,7 +46,7 @@ namespace flexed {
         instance->unset_linnum_global();
     }
 
-    settings::settings(editor* ed) {
+    settings::settings(editor_window* ed) {
         this->ed = ed;
         global_linnum_mode = false;
         ed->signal_text_view_created()

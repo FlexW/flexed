@@ -3,25 +3,25 @@
 
 namespace flexed {
 
-    class editor;
+    class editor_window;
 
 extern "C" {
     void smart_parens_end();
-    void smart_parens_start(editor *ed);
+    void smart_parens_start(editor_window* ed);
     void smart_parens_buffer_start();
     void smart_parens_buffer_end();
 }
 
 class smart_parens {
 public:
-    smart_parens(editor* ed);
+    smart_parens(editor_window* ed);
 
     void init_key_bindings();
     void remove_key_bindings();
     void add_closing_paren();
 
 private:
-    editor* ed;
+    editor_window* ed;
 };
 
 

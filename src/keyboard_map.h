@@ -75,11 +75,13 @@ public:
   void remove_key_binding(const std::string& key_binding);
 
   /**
-   * Calls the handler if the key_binding has a match. Returns code that one may use to indicate
+   * Calls the handler if the key_binding has a match.
+   * Returns code that one may use to indicate
    * if a binding was matched.
    * @param key_binding Key binding.
-   * @returns 0 = Matched function, 1 = Matched a binding in state1 but no function called yet,
-   * 2 = Matched a binding in state2 but no function called yet, -1 = no binding.
+   * @returns 0 = Matched function, 1 = Matched a binding in state1 but
+   * no function called yet, 2 = Matched a binding in state2 but
+   * no function called yet, -1 = no binding.
    */
   int call_handler(const std::string& key_binding);
 
@@ -105,17 +107,10 @@ private:
     return (static_cast<C*>(instance)->*handler)();
   }
 
-  //void set_key_binding_in_states(std::string& key_binding);
-
   /**
    * Split key binding into state1, state2, state3.
    */
   std::vector<std::string> split_key_bindings(const std::string& key_binding);
-
-  /**
-   * Inserts key binding into k_map_states.
-   */
-  //void insert_key_binding(std::string& key_binding, stub* val_p);
 
 void insert_key_binding(const std::string& key_binding, stub* val_p) {
   auto kb_split = split_key_bindings(key_binding);
@@ -129,14 +124,18 @@ void insert_key_binding(const std::string& key_binding, stub* val_p) {
   }
   if (kb_split[1].size() >= 1) {
     if (kb_split[2].size() >= 1) {
-      k_map_state2.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1], nullptr));
+      k_map_state2.insert(
+          std::pair<std::string, stub*>(kb_split[0] + kb_split[1], nullptr));
     }
     else {
-      k_map_state2.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1], val_p));
+      k_map_state2.insert(
+          std::pair<std::string, stub*>(kb_split[0] + kb_split[1], val_p));
     }
   }
   if (kb_split[2].size() >= 1) {
-    k_map_state3.insert(std::pair<std::string, stub*>(kb_split[0] + kb_split[1] + kb_split[2], val_p));
+    k_map_state3.insert(
+        std::pair<std::string, stub*>(kb_split[0] + kb_split[1] + kb_split[2],
+                                      val_p));
   }
 }
 

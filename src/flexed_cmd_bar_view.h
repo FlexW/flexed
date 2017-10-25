@@ -11,7 +11,7 @@
 #include <gdkmm.h>
 
 #include "flexed_text_view.h"
-#include "flexed_editor.h"
+#include "flexed_editor_window.h"
 
 namespace flexed {
 
@@ -24,7 +24,7 @@ namespace flexed {
 
     public:
 
-        cmd_bar_view(editor* ed);
+        cmd_bar_view(editor_window* editor_win);
 
         virtual ~cmd_bar_view();
 
@@ -38,13 +38,13 @@ namespace flexed {
          */
         template<class C, void (C::*callback)(Glib::ustring)>
         void prompt_cmd_bar(const Glib::ustring& prompt, C* instance) {
-            ed->set_focus(*cmd_text_view);
+            editor_win->set_focus(*cmd_text_view);
             //auto s = new stub(instance, &class_method_stub<C, callback>);
             prompt_callback = std::make_shared<stub>(
                 instance, &class_method_stub<C, callback>);
             cmd_text_view->set_editable(true);
             prompt_text_view->get_buffer()->set_text(prompt);
-            ed->get_keyboard_handler().set_keyboard_map(
+            editor_win->get_keyboard_handler().set_keyboard_map(
                 cmd_text_view->get_text_buffer()->get_keyboard_map());
         }
 
@@ -85,7 +85,7 @@ namespace flexed {
         typedef void (*internal_function)(instance_ptr, Glib::ustring);
         typedef std::pair<instance_ptr, internal_function>  stub;
 
-        editor *ed;
+        editor_window* editor_win;
 
         /**
          * Saves a function that should be called if the user presses
@@ -111,7 +111,7 @@ namespace flexed {
         }
 
         /** Calls initialization routines. */
-        void init(editor* ed);
+        void init(editor_window* editor_win);
 
         /**
          * Resets the prompt callback.

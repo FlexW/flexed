@@ -15,7 +15,7 @@ MODE_UPPERCASE=$(echo $MODE_UPPERCASE)$(echo "_FLEXED_H_")
 
 cat > "$1_flexed.cpp" << EOF
 #include <gtkmm.h>
-#include <flexed_editor.h>
+#include <flexed_editor_window.h>
 
 #include "$1_flexed.h"
 

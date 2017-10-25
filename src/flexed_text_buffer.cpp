@@ -4,7 +4,7 @@
 #include <cstring>
 
 #include "flexed_text_buffer.h"
-#include "flexed_editor.h"
+#include "flexed_editor_window.h"
 #include "keyboard_map.h"
 #include "flexed_mode.h"
 #include "log.h"

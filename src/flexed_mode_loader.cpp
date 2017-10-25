@@ -8,15 +8,15 @@
 #include <gtkmm.h>
 
 #include "flexed_mode_loader.h"
-#include "flexed_editor.h"
+#include "flexed_editor_window.h"
 #include "log.h"
 
 namespace flexed {
 
-    mode_loader::mode_loader(editor* ed) {
-        this->ed = ed;
+    mode_loader::mode_loader(editor_window* editor_win) {
+        this->editor_win = editor_win;
         mode_search_path = "/usr/lib/flexed";
-        ed->signal_text_buffer_created()
+        editor_win->signal_text_buffer_created()
             .connect(sigc::mem_fun(*this, &mode_loader::on_buffer_created));
     }
 
@@ -111,7 +111,7 @@ namespace flexed {
         }
         add_mode_to_every_buffer(mode_name);
         */
-        auto buffers = ed->get_global_text_buffer_container()->get_obj_vec();
+        auto buffers = editor_win->get_global_text_buffer_container()->get_obj_vec();
         for (auto buffer : buffers) {
             load_mode(buffer, mode_name);
         }
@@ -120,7 +120,7 @@ namespace flexed {
     }
 
     void mode_loader::unload_mode_global(std::string& mode_name) {
-        auto buffers = ed->get_global_text_buffer_container()->get_obj_vec();
+        auto buffers = editor_win->get_global_text_buffer_container()->get_obj_vec();
         for (auto buffer : buffers) {
             unload_mode(buffer, mode_name);
         }
@@ -169,7 +169,7 @@ namespace flexed {
             FILE_LOG(LOG_INFO) <<  "Start function not found";
             return;
         }
-        ffunction(ed);
+        ffunction(editor_win);
     }
 
     bool mode_loader::call_mode_buffer_start_function(std::string& mode_name) {

@@ -1,9 +1,9 @@
 /**
- * @file flexed_editor.h
+ * @file flexed_editor_window.h
  */
 
-#ifndef FLEXED_EDITOR_H_
-#define FLEXED_EDITOR_H_
+#ifndef FLEXED_EDITOR_WINDOW_H_
+#define FLEXED_EDITOR_WINDOW_H_
 
 #include <functional>
 #include <string>
@@ -31,13 +31,13 @@ namespace flexed {
     /**
      * Represents the editor window.
      */
-    class editor : public Gtk::Window {
+    class editor_window : public Gtk::Window {
 
     public:
 
-        editor();
+        editor_window();
 
-        virtual ~editor();
+        virtual ~editor_window();
 
         /**
          * Gets the signal buffer changed. This signal will be emitted,

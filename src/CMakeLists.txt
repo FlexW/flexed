@@ -37,8 +37,8 @@ SET(CMAKE_CXX_FLAGS
 
 add_library(
   flexed SHARED
-  flexed_editor.cpp
-  flexed_editor.h
+  flexed_editor_window.cpp
+  flexed_editor_window.h
   flexed_text_buffer.cpp
   flexed_text_buffer.h
   flexed_text_view.cpp
@@ -78,7 +78,7 @@ install(
 
 install(
   FILES
-  flexed_editor.h
+  flexed_editor_window.h
   flexed_text_buffer.h
   flexed_text_view.h
   flexed_paned.h

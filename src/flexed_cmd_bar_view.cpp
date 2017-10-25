@@ -8,8 +8,8 @@
 
 namespace flexed {
 
-    cmd_bar_view::cmd_bar_view(editor *ed) {
-        init(ed);
+    cmd_bar_view::cmd_bar_view(editor_window *editor_win) {
+        init(editor_win);
     }
 
     cmd_bar_view::~cmd_bar_view() {
@@ -19,18 +19,18 @@ namespace flexed {
         reset_prompt_callback();
         clear_cmd_bar();
         cmd_text_view->set_editable(false);
-        ed->set_focus(*(ed->get_active_text_view()));
+        editor_win->set_focus(*(editor_win->get_active_text_view()));
     }
 
     void cmd_bar_view::execute_cmd() {
         cmd_text_view->set_editable(false);
         auto text = cmd_text_view->get_buffer()->get_text(true);
         clear_cmd_bar();
-        ed->set_focus(*(ed->get_active_text_view()));
+        editor_win->set_focus(*(editor_win->get_active_text_view()));
         if (prompt_callback != nullptr) {
             FILE_LOG(LOG_DEBUG1) << "Callback execute cmd bar";
             auto callback = *prompt_callback;
-            ed->set_focus(*(ed->get_active_text_view()));
+            editor_win->set_focus(*(editor_win->get_active_text_view()));
             reset_prompt_callback();
             callback.second(callback.first, text);
         }
@@ -45,8 +45,8 @@ namespace flexed {
         prompt_text_view->get_buffer()->set_text(msg);
     }
 
-    void cmd_bar_view::init(editor *ed) {
-        this->ed = ed;
+    void cmd_bar_view::init(editor_window* editor_win) {
+        this->editor_win = editor_win;
         prompt_text_view = std::make_shared<text_view>();
         cmd_text_view = std::make_shared<text_view>();
         cmd_text_view_buffer = Glib::RefPtr<text_buffer>(new text_buffer());

@@ -14,11 +14,11 @@ extern "C" {
 
 namespace flexed {
 
-    class editor;
+    class editor_window;
     class text_buffer;
 
     typedef void key_binding_func_t();
-    typedef void start_func_t(editor*);
+    typedef void start_func_t(editor_window*);
 /**
  * Loads a flexed mode (shared library) into memory
  * and calls functions of this mode.
@@ -29,7 +29,7 @@ namespace flexed {
  */
 class mode_loader {
 public:
-    mode_loader(editor* ed);
+    mode_loader(editor_window* editor_win);
 
     virtual ~mode_loader();
 
@@ -78,7 +78,7 @@ public:
 
 private:
 
-    editor *ed;
+    editor_window *editor_win;
 
     /** Mode search path. */
     std::string mode_search_path;

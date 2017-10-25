@@ -14,8 +14,11 @@ namespace flexed {
  */
 class paned : public Gtk::Paned {
 public:
+
     paned();
+
     paned(Gtk::Orientation orientation);
+
     virtual ~paned();
 
     /**

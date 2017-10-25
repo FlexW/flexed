@@ -10,15 +10,8 @@
 #include <gtkmm.h>
 #include <gtksourceviewmm.h>
 
-#include "flexed_editor.h"
-//#include "flexed_editor.h"
-//#include "keyboard_map.h"
-//#include "flexed_mode.h"
-
 namespace flexed {
 
-//class editor;
-    class editor;
     class keyboard_map;
 
 /**

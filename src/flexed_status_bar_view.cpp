@@ -1,12 +1,12 @@
 #include "flexed_status_bar_view.h"
-#include "flexed_editor.h"
+#include "flexed_editor_window.h"
 #include "flexed_text_view.h"
 #include "flexed_text_buffer.h"
 
 namespace flexed{
 
-    status_bar_view::status_bar_view(editor* ed) : text_view() {
-        this->ed = ed;
+    status_bar_view::status_bar_view(editor_window* editor_win) : text_view() {
+        this->editor_win = editor_win;
         status_bar_buffer = Glib::RefPtr<text_buffer>();
         set_buffer(status_bar_buffer);
         set_editable(false);
@@ -40,12 +40,12 @@ namespace flexed{
     }
 
     void status_bar_view::set_filename() {
-        std::string name = ed->get_active_text_view_buffer()->get_name();
+        std::string name = editor_win->get_active_text_view_buffer()->get_name();
         filename_text_view.get_buffer()->set_text(name);
     }
 
     void status_bar_view::set_file_stats() {
-        auto buffer = ed->get_active_text_view_buffer();
+        auto buffer = editor_win->get_active_text_view_buffer();
         auto cursor_mark = buffer->get_insert();
         auto iter = buffer->get_iter_at_mark(cursor_mark);
 

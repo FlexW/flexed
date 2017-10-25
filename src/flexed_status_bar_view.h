@@ -12,13 +12,13 @@
 
 namespace flexed {
 
-    class editor;
+    class editor_window;
     class text_buffer;
 
     class status_bar_view : public text_view {
     public:
 
-        status_bar_view(editor* ed);
+        status_bar_view(editor_window* editor_win);
 
         virtual ~status_bar_view();
 
@@ -36,7 +36,7 @@ namespace flexed {
 
     private:
 
-        editor* ed;
+        editor_window* editor_win;
 
         Gtk::Box main_box;
 

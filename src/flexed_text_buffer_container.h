@@ -21,17 +21,20 @@ class global_text_buffer_container;
  * Text buffer container that is connected to a TextView.
  * Through this container a TextView can always know it's direction of
  * opend text buffers.
- * This container gets notified from global_text_buffer_container if a new text buffer is added.
+ * This container gets notified from global_text_buffer_container
+ * if a new text buffer is added.
  */
-class text_buffer_container : public orderd_container< Glib::RefPtr<text_buffer> > {
+class text_buffer_container
+    : public orderd_container< Glib::RefPtr<text_buffer> > {
 
 public:
   /**
    * @param global_container Container that notifes this container if new buffer added.
    * @param view Corresponding TextView.
    */
-    text_buffer_container(std::shared_ptr<global_text_buffer_container> global_container,
-                          Gtk::TextView* view);
+    text_buffer_container(
+        std::shared_ptr<global_text_buffer_container> global_container,
+        Gtk::TextView* view);
 
   virtual ~text_buffer_container();
 

@@ -1,0 +1,5 @@
+cmake
+clang
+libgtk-3-dev
+libgtksourceviewmm-3.0-dev
+libboost-all-dev
